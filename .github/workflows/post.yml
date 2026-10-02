@@ -91,6 +91,8 @@ jobs:
           KT_MEDIA_REMOTE: "1"
           KT_TZ: ${{ vars.KT_TZ || 'America/New_York' }}
           KT_SLOTS: ${{ secrets.KT_SLOTS }}
+          OFFER_URL: ${{ secrets.OFFER_URL }}
+          DISCLOSURE: ${{ vars.DISCLOSURE || '#ad - I earn a commission if you buy through my link.' }}
           KT_PLATFORMS: ${{ secrets.KT_PLATFORMS }}
           KT_CTA_KEYWORDS: ${{ secrets.KT_CTA_KEYWORDS }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
