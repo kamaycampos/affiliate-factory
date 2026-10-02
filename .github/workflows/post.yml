@@ -93,6 +93,7 @@ jobs:
           KT_SLOTS: ${{ secrets.KT_SLOTS }}
           OFFER_URL: ${{ secrets.OFFER_URL }}
           DISCLOSURE: ${{ vars.DISCLOSURE || '#ad - I earn a commission if you buy through my link.' }}
+          KIT_STUDIO: ${{ vars.AUTOPOST != 'on' && '1' || '0' }}
           KT_PLATFORMS: ${{ secrets.KT_PLATFORMS }}
           KT_CTA_KEYWORDS: ${{ secrets.KT_CTA_KEYWORDS }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
