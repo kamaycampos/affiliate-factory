@@ -46,7 +46,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
+      # Always the newest state: a queued run otherwise starts from the commit current
+      # when it was queued, and its state push collides (11 Oct 2026).
       - uses: actions/checkout@v4
+        with: { ref: main }
 
       - uses: actions/setup-python@v5
         with:
@@ -166,5 +169,11 @@ jobs:
           # 22 Sept 2026: a plain push lost a race and a clip was published
           # twice. Rebase and retry; the posted log in the release is the
           # safety net if even this fails.
-          for i in 1 2 3 4 5; do git pull -q --rebase --autostash && git push -q && ok=1 && break; sleep $((i*5)); done
+          for i in 1 2 3 4 5; do
+            if git pull -q --rebase -X theirs --autostash \
+               && python -c "import json; json.load(open('state/manifest.json'))" \
+               && git push -q; then ok=1; break; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((i*5))
+          done
           [ -n "$ok" ] || { echo "::error::state push failed - see posted_log.txt"; exit 1; }
