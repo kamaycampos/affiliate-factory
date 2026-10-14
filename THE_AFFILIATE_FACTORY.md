@@ -34,7 +34,7 @@ After setup, the member never has to do anything for the machine to keep working
 - **They watch it all from one page**, their control panel, and they never need to open GitHub.
 
 ### Target 2: their style, defined once, easily, and theirs
-Every member is different. Within a few minutes, by **choosing from pictures and examples, never by writing specs**, they define:
+Every member is different. **Their clips start plain** (white words, no colour, no effects). Within a few minutes, **by telling you in their own words or showing you examples they love** (a screenshot, a reel, a brand they admire), never by writing specs, they define:
 - **the look:** caption style, colours, capitals, font feel
 - **the voice:** calm teacher, bold challenger or storyteller
 - **the lane:** money, real estate, manifesting, business stories, mindset (and the mix)
@@ -86,7 +86,7 @@ Check each one yourself before you say "done". Don't take a tool's word for it: 
 
 ### Step 3: Their style, from pictures (5 min) · *Card 3*
 Ask **one question at a time**, always with **pictures or examples** to choose from:
-1. **"Which of these looks feels like you?"** Show the six looks on Card 3 of the visual guide. Each one is a real frame. Write their pick to `my_brand/style.json`.
+1. **"How do you want your clips to look?"** Their clips start **plain** (the default in `my_brand/style.json`). Ask them to **tell you or show you**: colours they love, their brand or logo, a screenshot or a reel whose look they want. Never hand them a menu of presets. Turn what they say into `my_brand/style.json` (colours, hook card colour, case, shadow, font; see the `style` section of `CLAUDE.md`), render **one preview frame** with their colours, and show it. Adjust until they say "yes, that's me".
 2. **"How should you sound?"** Calm teacher / bold challenger / storyteller. Read one example caption in each voice, then let them pick.
 3. **"What should your clips be about?"** Show the lanes with one real hook each (money: *"The 30% rule every wealthy person follows"*; real estate: *"How rich people actually buy houses"*; manifesting: *"$1 million before he turned 18"*). Ask for a rough mix.
 4. **"What word should people comment to get your link?"** Suggest **MONEY** or **BRAIN**, the two strongest measured.
@@ -103,13 +103,14 @@ Ask **one question at a time**, always with **pictures or examples** to choose f
 Then `[You]` set the repository **variable** `AUTOPOST` = `on`, and the secret `KT_PLATFORMS` = the platforms you connected (e.g. `instagram,facebook,youtube,tiktok`).
 
 ### Step 5: Comment → DM, their link sent automatically (5 min) · *Card 5*
+**Meta's own rule is the way: it answers in seconds, publicly and by DM.** Set it up first, always.
 - `[You]` Open **business.facebook.com → Inbox → Automations → Create automation → Comment to message**. It's built into Meta, free, and needs no app.
   - Channels: Instagram and Facebook
   - Keywords: their word, in capitals and lowercase (e.g. `MONEY`, `money`)
   - Private message: *"Here it is: {their link} - #ad, I earn a commission if you buy through my link."*
   - Public reply: *"Just sent it to you - check your messages"*
   - Save, then **reload the page** and confirm the rule shows as ON.
-- Or switch on the factory's own DM bot instead (it logs every send) (`DM_AUTO` = `on`; the Page token needs `pages_messaging` and `instagram_manage_messages`). **Use one system, never both**, or people get two DMs.
+- **Backup only:** if Meta's rule stays silent (it can stop if Meta ever restricts the Page), turn the rule OFF and switch on the factory's own DM bot (`DM_AUTO` = `on`; the Page token needs `pages_messaging` and `instagram_manage_messages`). It answers within minutes, not seconds. **Use one system, never both**, or people get two DMs.
 - **Prove it:** ask them to comment the keyword from another account (a friend or a second profile) on any post, and watch the DM arrive together. If it doesn't arrive in 2 minutes, say exactly why. Don't leave it.
 
 ### Step 6: Switch it on, and the weekly brain (2 min) · *Card 6*

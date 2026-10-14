@@ -1,14 +1,15 @@
 {
  "_help": "Your clips' look. Delete any line to keep the house default. Type `style` in Claude to change it by talking.",
- "accent_color": "#FFE500",
+ "accent_color": "white",
  "text_color": "white",
- "shadow": "heavy",
- "uppercase": true,
+ "shadow": "soft",
+ "uppercase": false,
  "hook_seconds": 4.5,
  "hook_size": 92,
  "caption_size": 72,
  "caption_y": 1050,
  "hook_bottom": 930,
- "accent_captions": true,
- "font_file": ""
+ "accent_captions": false,
+ "font_file": "",
+ "_look": "PLAIN: every member starts here. Their Claude changes it from what they say or show."
 }
