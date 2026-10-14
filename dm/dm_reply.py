@@ -90,14 +90,18 @@ def _ts(t):
 
 def instagram_comments(ig, tok):
     """(comment_id, text, when, media_id, author) on the newest posts."""
-    media = _get(f"{G}/{ig}/media", {"fields": "id,timestamp", "limit": RECENT_POSTS,
+    media = _get(f"{G}/{ig}/media", {"fields": "id,timestamp,comments_count", "limit": RECENT_POSTS,
                                        "access_token": tok}).get("data", [])
+    diag = os.environ.get("DM_DIAG") == "1"
     out = []
     for m in media:
         if _ts(m["timestamp"]) < datetime.now(timezone.utc) - WINDOW - timedelta(days=30):
             continue
         cs = _get(f"{G}/{m['id']}/comments", {"fields": "id,text,timestamp,username,replies{username}",
                                                "limit": 50, "access_token": tok}).get("data", [])
+        if diag:
+            print(f"  post {m['timestamp'][:16]}: says {m.get('comments_count')} comments, API gave {len(cs)}"
+                  f" {[(c.get('text') or '')[:12] for c in cs]}")
         out += [(c["id"], c.get("text", ""), c["timestamp"], m["id"], c.get("username", ""),
                  {r.get("username", "") for r in (c.get("replies") or {}).get("data", [])})
                 for c in cs]
@@ -202,6 +206,18 @@ def run(dry=False):
                 rec["message"] = private_reply(page, tok, cid, text)
                 d["sent"][cid] = rec
                 sent += 1
+                # THE PUBLIC REPLY, like Meta's own rule did (14 Oct 2026, Kamay: "before it
+                # replied to the comment"). It tells the viewer to check their messages -
+                # a DM from a page they don't follow lands in Requests - and other viewers
+                # see that commenting works. Never fatal: the DM is what matters.
+                if platform == "instagram" and os.environ.get("DM_PUBLIC_REPLY", "on") != "off":
+                    try:
+                        r = requests.post(f"{G}/{cid}/replies", timeout=T, params={
+                            "message": os.environ.get("DM_PUBLIC_TEXT") or "Just sent it to you - check your messages \U0001F4E9",
+                            "access_token": tok})
+                        rec["public_reply"] = "ok" if r.ok and "id" in (r.json() or {}) else (r.json() or {}).get("error", {}).get("message", "")[:120]
+                    except Exception as e:
+                        rec["public_reply"] = f"error: {type(e).__name__}"
             except Exception as e:
                 d["errors"].append({"at": now.isoformat(), "platform": platform,
                                     "comment": cid, "error": str(e)})
