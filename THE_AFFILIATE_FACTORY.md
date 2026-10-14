@@ -6,6 +6,8 @@
 > 2. Drag this file into the message box and type: **Set me up.**
 > 3. For about 30 minutes, your Claude does the work. You only **log in**, click **Allow**, and **pick what you like** from pictures.
 >
+> **Cost: nothing beyond your Claude Pro plan.**
+>
 > No Claude app yet? Download it free at **claude.ai/download** and sign in with your Claude Pro account. You'll also want the free **Claude in Chrome** extension; your Claude will show you where to get it.
 
 ---
@@ -26,7 +28,7 @@ After setup, the member never has to do anything for the machine to keep working
 - **New Kevin episodes are found and cut automatically.** His newest upload is cut first, the same day it appears.
 - **Every week the best moments are chosen** (a scheduled Claude routine) in the member's voice, opening on the strongest line. The first 3 seconds decide everything.
 - **Clips are made in full HD**, with a six-word hook and word-perfect captions timed to Kevin's voice. Every clip passes quality gates before it can be posted.
-- **Clips post themselves** to Instagram, Facebook, YouTube and TikTok, spaced like a human would post them.
+- **Clips post themselves** to Instagram, Facebook and YouTube, spaced like a human would post them. TikTok clips arrive in drafts, ready to post with one tap.
 - **Every comment with their keyword gets their link by DM**, automatically, once per person.
 - **Their numbers are measured** (views, comments, DMs, clicks), and what works feeds the next week's choices.
 - **They watch it all from one page**, their control panel, and they never need to open GitHub.
@@ -45,7 +47,7 @@ Check each one yourself before you say "done". Don't take a tool's word for it: 
 - [ ] Their own copy of the factory exists in **their** GitHub, and their control panel opens in the browser
 - [ ] Their brand file holds their name, voice, lane and keyword (read it back to them)
 - [ ] Their style is chosen, and they have **seen** what a clip will look like
-- [ ] At least one platform posts automatically, ideally all four
+- [ ] Instagram, Facebook and YouTube post automatically; TikTok drafts arrive ready to tap
 - [ ] Comment → DM answers their keyword (prove it: comment the keyword from a second account and watch the DM arrive)
 - [ ] The first factory run has started (the first clips arrive in 1–3 hours)
 - [ ] The weekly planning routine exists on their Claude account
@@ -92,31 +94,22 @@ Ask **one question at a time**, always with **pictures or examples** to choose f
 
 `[You]` Write `my_brand/BRAND.md`. Read it back in **five short lines** and ask *"Anything to change?"*
 
-### Step 4: Connect the platforms (10 min) · *Card 4*
-Offer the two routes in one message, honestly. Recommend Easy:
+### Step 4: Connect the platforms (15 min) · *Card 4*
+**Everything here is free. Their only cost is Claude Pro.** Do it in this order:
+- **Instagram + Facebook (one Meta setup covers both):** follow `SETUP_META.md` yourself, in their Chrome (Meta app, Page token). `[Them]` click **Continue as…** and **Allow**. From then on, both post by themselves.
+- **YouTube:** follow the YouTube part of `SETUP_POSTING.md` yourself (Google Cloud project, YouTube Data API, consent screen **published to Production**, token). `[Them]` click **Allow**. YouTube then posts by itself. If Google ever keeps a new project's uploads private, fill in Google's free YouTube API review form with them; until it passes, those clips are one tap from the panel.
+- **TikTok:** clips arrive in their **TikTok drafts** with the caption ready, and they tap **Post**. TikTok doesn't approve personal posting apps yet. Tell them plainly that this is the one tap that stays.
 
-**EASY (recommended), about 10 minutes, all four platforms, TikTok fully automatic.**
-Uses **Upload-Post**, an approved posting service (about $16–24 a month). No developer apps.
-- `[You]` Open **app.upload-post.com**. `[Them]` sign up.
-- `[You]` Create one profile named after their brand. Then for each platform, `[Them]` click **Connect** and log in: Instagram, Facebook, YouTube, TikTok.
-- `[You]` Copy the API key into the secret `UPLOADPOST_API_KEY` and the profile name into `UPLOADPOST_USER`, then set `KT_PLATFORMS` = `instagram,facebook,youtube,tiktok`. All of this happens in their browser; never paste the key in chat.
-
-**FREE, about 15 minutes for Instagram and Facebook; YouTube and TikTok wait for approvals.**
-- Instagram + Facebook: follow `SETUP_META.md` yourself (Meta app, Page token). `[Them]` click **Continue as…**
-- YouTube: Google keeps uploads private until a free review passes (days to weeks). Until then, clips post from the control panel in two taps.
-- TikTok: TikTok does not approve personal apps, so on this route TikTok clips arrive as drafts and they tap **Post**.
-- Tell them plainly: *"Free works now for Instagram and Facebook. For YouTube and TikTok to be fully hands-off, Easy is the way."*
-
-Then `[You]` set the repository **variable** `AUTOPOST` = `on`.
+Then `[You]` set the repository **variable** `AUTOPOST` = `on`, and the secret `KT_PLATFORMS` = the platforms you connected (e.g. `instagram,facebook,youtube,tiktok`).
 
 ### Step 5: Comment → DM, their link sent automatically (5 min) · *Card 5*
-- `[You]` Open **business.facebook.com → Inbox → Automations → Create automation → Comment to message**. On the Easy route this is the whole DM system, with no app needed.
+- `[You]` Open **business.facebook.com → Inbox → Automations → Create automation → Comment to message**. It's built into Meta, free, and needs no app.
   - Channels: Instagram and Facebook
   - Keywords: their word, in capitals and lowercase (e.g. `MONEY`, `money`)
   - Private message: *"Here it is: {their link} - #ad, I earn a commission if you buy through my link."*
   - Public reply: *"Just sent it to you - check your messages"*
   - Save, then **reload the page** and confirm the rule shows as ON.
-- On the Free route you may instead switch on the factory's own DM bot (`DM_AUTO` = `on`; the Page token needs `pages_messaging` and `instagram_manage_messages`). **Use one system, never both**, or people get two DMs.
+- Or switch on the factory's own DM bot instead (it logs every send) (`DM_AUTO` = `on`; the Page token needs `pages_messaging` and `instagram_manage_messages`). **Use one system, never both**, or people get two DMs.
 - **Prove it:** ask them to comment the keyword from another account (a friend or a second profile) on any post, and watch the DM arrive together. If it doesn't arrive in 2 minutes, say exactly why. Don't leave it.
 
 ### Step 6: Switch it on, and the weekly brain (2 min) · *Card 6*
@@ -153,7 +146,6 @@ Then `[You]` set the repository **variable** `AUTOPOST` = `on`.
 ## 6. IF SOMETHING BLOCKS
 - **A platform refuses a login or asks for a phone code:** they enter it; you wait. Never ask them to read you a code.
 - **Meta asks to verify the Page or the person:** they do it on their phone; you continue with the next step meanwhile.
-- **Upload-Post asks for payment:** they enter their card themselves. If they'd rather not pay, switch to the Free route without fuss.
 - **Anything takes more than 5 minutes extra:** say what it is, give the simplest workaround, and keep the finish line in sight.
 
 *Built and proven on a live account first: 214,805 views on one reel, 6 posts a day across four platforms, no servers.*
