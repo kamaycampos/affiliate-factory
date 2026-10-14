@@ -26,6 +26,8 @@ if __name__ == "__main__" and not os.environ.get("FACTORY_KEY"):   # run as a jo
 TAG, REPO = "sources", os.environ.get("GITHUB_REPOSITORY", "YOUR-GITHUB-NAME/YOUR-REPO")
 arg = lambda n, d: int(sys.argv[sys.argv.index(n) + 1]) if n in sys.argv else d
 MAX, STOCK = arg("--max", 2), arg("--stock", 6)
+GIVE_UP = 3                     # failed runs before an unfetchable episode steps aside
+PART = 1900 * 1024 * 1024       # GitHub refuses a release asset of 2 GiB or more
 
 
 def sh(*a):
@@ -47,16 +49,45 @@ def main():
     done = set(json.load(open(os.path.join(HERE, "plans", "_done.json"))))
     planned = " ".join(open(os.path.join(HERE, "plans", f)).read()
                        for f in os.listdir(os.path.join(HERE, "plans")) if f.endswith(".json"))
+    # ONLY WHAT A PLANNER WILL PLAN COUNTS AS WAITING (14 Oct 2026). Every stocked episode
+    # that was never planned counted here - dozens picked up automatically weeks ago that
+    # neither month list names - so the stock looked full, nothing was fetched, five
+    # episodes on Kamay's list were never downloaded and his queue ran dry for 27 hours.
+    _lists = set()
+    for _f in ("source_plan.json", "ar_source_plan.json"):
+        if os.path.exists(os.path.join(HERE, _f)):
+            _lists |= {x["id"] for x in json.load(open(os.path.join(HERE, _f)))["episodes"]}
     waiting = [v for v, e in idx.items() if e.get("status") == "stocked" and not e.get("test")
-               and v not in planned]
-    need = min(MAX, STOCK - len(waiting))
-    print(f"{len(waiting)} stocked episode(s) not yet planned; stock target {STOCK}; fetching {max(need, 0)}")
-    if need <= 0:
-        return
+               and v not in planned and v in _lists]
+    missing = [v for v in _lists if v not in idx or (idx[v].get("status") == "fetch_failed"
+                                                     and idx[v].get("fails", 0) < GIVE_UP)]
+    need = min(MAX, max(STOCK - len(waiting), len(missing)))
+    print(f"month lists: {len(_lists)} episodes, {len(missing)} not downloaded yet")
     series = json.load(open(os.path.join(HERE, "kt_series.json")))
     used = {norm(os.path.splitext(s.get("source", ""))[0])[:40] for s in series.values()}
     cat = json.load(open(os.path.join(HERE, "rumble_catalog.json")))
-    have = {e.get("rumble") for e in idx.values()}
+    # THE NEWEST UPLOAD IS NEVER KEPT WAITING (Kamay, 11 Oct 2026: the latest episode is
+    # cut and posted the same day, priority #1). A full episode uploaded in the last 14
+    # days that is not stocked yet is fetched even when the stock target is met, and it
+    # goes ahead of the month lists below.
+    _cut = time.strftime("%Y-%m-%d", time.gmtime(time.time() - 14 * 86400))
+    _vid = lambda u: (re.search(r"/(v[a-z0-9]+)-", u) or [None, ""])[1]
+    fresh = {_vid(u) for u, e in cat.items()
+             if not e["short"] and e.get("date", "") >= _cut and _vid(u) not in idx}
+    if fresh and need <= 0:
+        need = min(MAX, len(fresh))
+    print(f"{len(waiting)} stocked episode(s) not yet planned; stock target {STOCK}; "
+          f"{len(fresh)} new upload(s); fetching {max(need, 0)}")
+    if need <= 0:
+        return
+    # A FAILED FETCH IS REMEMBERED (5 Oct 2026). Every run spent ~5 minutes on each of
+    # five episodes whose saved stream was a signed CDN link that had expired
+    # (hugh.cdn.rumble.cloud/....mp4 - 403) and whose page Cloudflare refuses, while
+    # the rumble.com/hls-vod/ links kept working. They are retried on the next runs,
+    # and after GIVE_UP failed runs they step aside so the slot goes to an episode
+    # that can actually be fetched.
+    have = {e.get("rumble") for e in idx.values()
+            if not (e.get("status") == "fetch_failed" and e.get("fails", 0) < GIVE_UP)}
     # AN EPISODE HE NAMED IS NEVER FILTERED OUT BY LENGTH. 30 Sept 2026: Kamay
     # put that day's upload at the top of the list - "You Keep Missing The
     # Biggest Opportunities", 4K, SIX MINUTES - and the stocker silently ignored
@@ -70,7 +101,7 @@ def main():
         if os.path.exists(fp):
             listed |= {x["id"] for x in json.load(open(fp))["episodes"]}
     vid_of = lambda u: (re.search(r"/(v[a-z0-9]+)-", u) or [None, ""])[1]
-    floor = lambda u, e: 180 if vid_of(u) in listed else 1200
+    floor = lambda u, e: 180 if vid_of(u) in listed or vid_of(u) in fresh else 1200
     pick = [(u, e) for u, e in sorted(cat.items(), key=lambda x: x[1]["date"], reverse=True)
             if not e["short"] and e["dur"] >= floor(u, e) and e["height"] >= 1080
             and u not in have and norm(e["title"])[:40] not in used]
@@ -88,7 +119,15 @@ def main():
         rank = lambda ue: order.index(re.search(r"/(v[a-z0-9]+)-", ue[0])[1]) \
             if re.search(r"/(v[a-z0-9]+)-", ue[0])[1] in order else len(order)
         pick.sort(key=rank)
-    for url, e in pick[:need]:
+    # Within that order, an episode whose stream is a rumble.com/hls-vod/ playlist goes
+    # before one carrying an old signed CDN file link (those expire and answer 403).
+    pick.sort(key=lambda ue: 0 if "/hls-vod/" in (ue[1].get("hls") or "") else 1)
+    pick.sort(key=lambda ue: 0 if _vid(ue[0]) in fresh else 1)      # newest uploads first, always
+    stocked, tried = 0, 0
+    for url, e in pick:
+        if stocked >= need or tried >= need * 2:
+            break
+        tried += 1
         vid = re.search(r"/(v[a-z0-9]+)-", url)[1]
         mp4 = os.path.join(SRC, f"{vid}.mp4")
         print(f"  {vid}  {e['dur']/60:.0f} min  {e['height']}p  {e['title'][:70]}")
@@ -105,21 +144,69 @@ def main():
         if h == 0:
             # Cloudflare turned every attempt away. Not the episode's fault: try
             # again on the next run instead of writing it off.
-            print(f"    NOT FETCHED this run, will retry ({r.stderr.strip()[-120:]})")
+            prev = idx.get(vid, {})
+            fails = prev.get("fails", 0) + 1 if prev.get("status") == "fetch_failed" else 1
+            idx[vid] = {"title": e["title"], "rumble": url, "status": "fetch_failed", "fails": fails}
+            print(f"    NOT FETCHED ({fails}/{GIVE_UP}) ({r.stderr.strip()[-120:]})")
             continue
+        # THE TOP RESOLUTION KEVIN UPLOADED, NOT THE FIRST ONE THAT ARRIVED (14 Oct 2026).
+        # Six episodes came in below what Rumble offers - the 7 Oct one at 1440p while its
+        # stream carries 3840x2160 - because a refused stream fell back to the page, which
+        # can serve less. Kamay: "only deliver the best of the best quality". When the
+        # file is short of the catalogue's height, fetch the stream again and keep the
+        # better copy.
+        want = int(e.get("height") or 0)
+        if 0 < h < want and e.get("hls"):
+            better = mp4[:-4] + ".hi.mp4"
+            for attempt in range(3):
+                sh("yt-dlp", "--no-warnings", "-q", "--impersonate", "chrome", "-N", "8",
+                   "-f", "bv*[height<=2160]+ba/b[height<=2160]", "--merge-output-format", "mp4",
+                   "-o", better, e["hls"])
+                if os.path.exists(better) and height(better) > h:
+                    os.replace(better, mp4)
+                    print(f"    upgraded {h}p -> {height(mp4)}p (catalogue says {want}p)")
+                    h = height(mp4)
+                    break
+                time.sleep(20 * (attempt + 1))
+            if h < want:
+                print(f"    NOTE: kept {h}p, Rumble lists {want}p - the stream refused a better copy")
         if h < 1080:
             print(f"    REFUSED: {h}p - under the 1080p gate")
             idx[vid] = {"title": e["title"], "rumble": url, "status": "rejected", "height": h}
             continue
+        # OVER 2 GiB GOES UP IN PARTS (5 Oct 2026). GitHub refuses any release asset of
+        # 2 GiB or more, and every episode over ~70 minutes encrypts past that: five of
+        # ten downloads in one run were thrown away at upload ("size must be less than
+        # 2147483648"), so nothing new reached the planners and both queues ran dry.
+        # The ciphertext is cut into <vid>.mp4.enc.part00, part01, ... and
+        # transcribe.fetch_source joins them back byte for byte before decrypting.
+        # Streamed through split, so the disk holds the video once, not twice.
         enc = f"/tmp/{vid}.mp4.enc"
-        sh("openssl", "enc", "-aes-256-cbc", "-pbkdf2", "-salt", "-pass", "env:FACTORY_KEY", "-in", mp4, "-out", enc)
-        u = sh("gh", "release", "upload", TAG, enc, "--clobber", "-R", REPO)
-        os.remove(enc)
+        if os.path.getsize(mp4) < PART - 1024 * 1024:
+            sh("openssl", "enc", "-aes-256-cbc", "-pbkdf2", "-salt", "-pass", "env:FACTORY_KEY",
+               "-in", mp4, "-out", enc)
+            files = [enc]
+        else:
+            subprocess.run(f'openssl enc -aes-256-cbc -pbkdf2 -salt -pass env:FACTORY_KEY -in "{mp4}" '
+                           f'| split -b {PART} -d -a 2 - "{enc}.part"', shell=True, check=True)
+            files = sorted(f"/tmp/{f}" for f in os.listdir("/tmp") if f.startswith(f"{vid}.mp4.enc.part"))
+        u = None
+        for f in files:
+            u = sh("gh", "release", "upload", TAG, f, "--clobber", "-R", REPO)
+            os.remove(f)
+            if u.returncode:
+                break
+        # The download is in the release now (or failed); keep the runner's disk free
+        # for the next one - ten long episodes do not fit on one runner at once.
+        os.remove(mp4)
         if u.returncode:
             print(f"    UPLOAD FAILED {u.stderr[-150:]}")
             continue
+        if len(files) > 1:
+            print(f"    uploaded in {len(files)} parts")
         idx[vid] = {"title": e["title"], "rumble": url, "duration": e["dur"], "height": h,
                     "status": "stocked", "uploaded": time.strftime("%Y-%m-%dT%H:%M")}
+        stocked += 1
         print(f"    STOCKED {h}p")
     json.dump(idx, open("/tmp/sources_index.json", "w"), indent=1)
     sh("gh", "release", "upload", TAG, "/tmp/sources_index.json", "--clobber", "-R", REPO)

@@ -3,7 +3,8 @@
 
 Proves: a whole-word keyword in any case gets ONE DM, 'brainstorm' does not,
 comments older than Meta's 7-day window are skipped, the member's own comments
-are skipped, a second run sends nothing twice, and the disclosure always rides."""
+are skipped, a comment the account already answered (Meta's own rule) is skipped,
+a second run sends nothing twice, and the disclosure always rides."""
 import json
 import os
 import sys
@@ -39,7 +40,9 @@ def get(url, params=None, timeout=None):
             {"id": "c2", "text": "brainstorm idea", "timestamp": iso(timedelta(hours=2)), "username": "bob"},
             {"id": "c3", "text": "BRAIN", "timestamp": iso(timedelta(days=9)), "username": "old"},
             {"id": "c4", "text": "money please", "timestamp": iso(timedelta(hours=1)), "username": "cy"},
-            {"id": "c5", "text": "Comment BRAIN for the link", "timestamp": iso(timedelta(hours=1)), "username": "me_myself"}]})
+            {"id": "c5", "text": "Comment BRAIN for the link", "timestamp": iso(timedelta(hours=1)), "username": "me_myself"},
+            {"id": "c6", "text": "MONEY", "timestamp": iso(timedelta(hours=1)), "username": "dee",
+             "replies": {"data": [{"username": "me_myself"}]}}]})
     if url.endswith("/PG/video_reels"):
         return R({"data": [{"id": "V1"}]})
     if url.endswith("/V1/comments"):

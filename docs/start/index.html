@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Affiliate Factory Setup</title>
+<meta name="description" content="Your 30-minute setup, one picture per step. Your Claude does the work; you log in, click Allow, and choose.">
+<style>
+:root{--bg:#f6f4ef;--card:#ffffff;--ink:#1b1a17;--soft:#5f5b52;--line:#e4dfd3;--gold:#b8862e;--goldbg:#fbf3e2;--ok:#1f7a4a;--okbg:#e6f4ec;--you:#7a3fd1;--youbg:#f1eafc;--claude:#a8541b;--claudebg:#fbeee4}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#13120f;--card:#1d1c18;--ink:#f3efe6;--soft:#b3ad9f;--line:#33302a;--gold:#e0b45c;--goldbg:#2a2316;--ok:#59c48b;--okbg:#14261c;--you:#b994f2;--youbg:#251d33;--claude:#e8955a;--claudebg:#2c1f15}}
+:root[data-theme="dark"]{--bg:#13120f;--card:#1d1c18;--ink:#f3efe6;--soft:#b3ad9f;--line:#33302a;--gold:#e0b45c;--goldbg:#2a2316;--ok:#59c48b;--okbg:#14261c;--you:#b994f2;--youbg:#251d33;--claude:#e8955a;--claudebg:#2c1f15}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:28px 16px 80px}
+h1{font-size:clamp(30px,6vw,46px);line-height:1.1;margin:8px 0 10px;letter-spacing:-.02em}
+h2{font-size:26px;margin:0 0 6px}
+.kicker{color:var(--gold);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:13px}
+.lead{font-size:20px;color:var(--soft);margin:0 0 22px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 8px}
+.three div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;text-align:center}
+.three b{display:block;font-size:30px}
+.three span{color:var(--soft);font-size:15px}
+.scene{background:var(--goldbg);border:1px solid var(--line);border-radius:20px;padding:22px;margin:26px 0}
+.scene h2{color:var(--gold)}
+.targets{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+.targets div{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--line)}
+.targets h3{margin:0 0 6px;font-size:19px}
+.targets ul{margin:0;padding-left:20px;color:var(--soft);font-size:16px}
+.loop{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px;font-size:15px}
+.loop span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+.loop i{color:var(--gold);font-style:normal}
+.step{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;margin:22px 0;box-shadow:0 1px 0 rgba(0,0,0,.03)}
+.top{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.num{flex:none;width:52px;height:52px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-weight:800;font-size:24px}
+.time{margin-left:auto;color:var(--soft);font-size:15px;white-space:nowrap}
+.who{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.who div{border-radius:14px;padding:12px 14px;font-size:16px}
+.you{background:var(--youbg)}.you b{color:var(--you)}
+.cl{background:var(--claudebg)}.cl b{color:var(--claude)}
+.screen{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--bg);margin-top:8px}
+.screen .cap{font-size:13px;color:var(--soft);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
+.ghbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.repo{font-weight:600}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:8px;padding:9px 14px;font-weight:600;font-size:15px;border:1px solid transparent}
+.gh{background:#1f883d;color:#fff}
+.ghost{background:var(--card);border-color:var(--line);color:var(--ink)}
+.pulse{outline:3px solid #f5b400;outline-offset:3px;animation:p 1.6s infinite}
+@keyframes p{50%{outline-color:transparent}}
+.arrow{color:#d48a00;font-weight:800}
+.looks{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.looks figure{margin:0;text-align:center}
+.looks img{width:100%;border-radius:12px;display:block;border:1px solid var(--line)}
+.looks figcaption{font-weight:700;margin-top:6px;font-size:16px}
+.looks small{display:block;color:var(--soft);font-weight:400}
+.plats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.plat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;font-size:15px}
+.plat .dot{width:34px;height:34px;border-radius:9px;margin:0 auto 8px}
+.ig{background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)}.fb{background:#1877f2}.yt{background:#ff0000}.tt{background:#111}
+.chip{display:inline-block;margin-top:6px;font-size:13px;border-radius:999px;padding:3px 10px;background:var(--okbg);color:var(--ok);font-weight:700}
+.rule{display:grid;gap:8px;font-size:15px}
+.rule div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.rule b{color:var(--soft);font-weight:600;display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.dm{display:flex;flex-direction:column;gap:8px;max-width:420px}
+.bub{border-radius:18px;padding:10px 14px;font-size:15px;max-width:85%}
+.them{background:var(--line);align-self:flex-start}
+.me{background:#3797f0;color:#fff;align-self:flex-end}
+.done li{margin:6px 0}
+.ok{color:var(--ok);font-weight:800}
+.note{font-size:15px;color:var(--soft);margin-top:10px}
+.foot{margin-top:40px;color:var(--soft);font-size:14px;text-align:center}
+@media (max-width:640px){.three,.targets,.who{grid-template-columns:1fr}.looks{grid-template-columns:repeat(2,1fr)}.plats{grid-template-columns:repeat(2,1fr)}body{font-size:17px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="kicker">The Affiliate Factory</div>
+<h1>Your clip machine, set up in 30 minutes.</h1>
+<p class="lead">Your Claude does the work. You only do three things: <b>log in</b>, click <b>Allow</b>, and <b>pick what you like</b> from pictures.</p>
+
+<div class="three">
+  <div><b>30 min</b><span>of your time, once</span></div>
+  <div><b>7 steps</b><span>one picture each</span></div>
+  <div><b>Forever</b><span>it runs by itself after</span></div>
+</div>
+
+<section class="scene" id="ideal">
+  <h2>Where this ends: the ideal scene</h2>
+  <div class="targets">
+    <div>
+      <h3>1 · Everything runs by itself</h3>
+      <ul>
+        <li>Kevin's newest episode is cut the same day</li>
+        <li>Best moments chosen weekly, strongest line first</li>
+        <li>HD clips, hook and word-perfect captions</li>
+        <li>Posts itself to Instagram, Facebook, YouTube, TikTok</li>
+        <li>Every keyword comment gets your link by DM</li>
+        <li>Your numbers measured, and the next week gets smarter</li>
+      </ul>
+    </div>
+    <div>
+      <h3>2 · Your style, chosen once</h3>
+      <ul>
+        <li>Pick your look from 6 pictures</li>
+        <li>Pick your voice: teacher, challenger or storyteller</li>
+        <li>Pick your topics: money, real estate, manifesting…</li>
+        <li>Pick the word people comment</li>
+        <li>Change anything later just by saying it</li>
+      </ul>
+    </div>
+  </div>
+  <div class="loop"><span>New Kevin episode</span><i>→</i><span>Best moments chosen</span><i>→</i><span>Your-style clips</span><i>→</i><span>Posted for you</span><i>→</i><span>Comment → DM with your link</span><i>→</i><span>Numbers teach next week</span><i>↺</i></div>
+</section>
+
+<!-- STEP 0 -->
+<section class="step" id="card0">
+  <div class="top"><div class="num">0</div><h2>Ready check</h2><div class="time">2 min</div></div>
+  <div class="who">
+    <div class="you"><b>You</b> · Open the Claude app → <b>Code</b>, drag in the setup file, and type <b>Set me up</b>.</div>
+    <div class="cl"><b>Claude</b> · Checks it can drive your Chrome. If not, it shows you the one button that adds it.</div>
+  </div>
+  <div class="screen"><div class="cap">What you'll see</div>
+    <div class="ghbar"><span class="repo">Claude in Chrome</span><span class="btn gh pulse">Add to Chrome</span><span class="arrow">← click this once</span></div>
+  </div>
+  <p class="note">Have ready: your KT affiliate link, and the logins for your Instagram, Facebook, YouTube and TikTok.</p>
+</section>
+
+<!-- STEP 1 -->
+<section class="step" id="card1">
+  <div class="top"><div class="num">1</div><h2>Your own factory</h2><div class="time">4 min</div></div>
+  <div class="who">
+    <div class="you"><b>You</b> · Log in to GitHub (or sign up with your email). That's it.</div>
+    <div class="cl"><b>Claude</b> · Makes your private copy of the factory, named <code>my-factory</code>.</div>
+  </div>
+  <div class="screen"><div class="cap">What you'll see</div>
+    <div class="ghbar"><span class="repo">kamaycampos / affiliate-factory</span><span class="btn gh pulse">Use this template ▾</span><span class="btn ghost">Code</span></div>
+  </div>
+</section>
+
+<!-- STEP 2 -->
+<section class="step" id="card2">
+  <div class="top"><div class="num">2</div><h2>Keys and your control panel</h2><div class="time">3 min</div></div>
+  <div class="who">
+    <div class="you"><b>You</b> · Nothing. Watch if you like.</div>
+    <div class="cl"><b>Claude</b> · Stores your keys and your affiliate link safely, and switches on your own control panel page.</div>
+  </div>
+  <div class="screen"><div class="cap">What you'll see</div>
+    <div class="ghbar"><span class="btn ghost">Settings</span><span class="arrow">→</span><span class="btn ghost">Secrets and variables</span><span class="arrow">→</span><span class="btn gh">New repository secret</span></div>
+  </div>
+</section>
+
+<!-- STEP 3 -->
+<section class="step" id="card3">
+  <div class="top"><div class="num">3</div><h2>Your style: just pick</h2><div class="time">5 min</div></div>
+  <div class="who">
+    <div class="you"><b>You</b> · Point at the look you like. Then answer 4 quick questions: voice, topics, comment word, your name.</div>
+    <div class="cl"><b>Claude</b> · Turns your picks into your style, so every clip is made that way from now on.</div>
+  </div>
+  <div class="looks">
+    <figure><img src="img/look_bold.jpg" alt="Bold and Bright: white capitals, yellow key word" loading="lazy"><figcaption>1 · Bold &amp; Bright<small>white caps, yellow word</small></figcaption></figure>
+    <figure><img src="img/look_gold.jpg" alt="Gold Luxe: white capitals, gold key word" loading="lazy"><figcaption>2 · Gold Luxe<small>premium, gold accent</small></figcaption></figure>
+    <figure><img src="img/look_clean.jpg" alt="Clean and Calm: soft lowercase captions" loading="lazy"><figcaption>3 · Clean &amp; Calm<small>soft, lowercase</small></figcaption></figure>
+    <figure><img src="img/look_neon.jpg" alt="Neon Energy: white capitals, green key word" loading="lazy"><figcaption>4 · Neon Energy<small>bright green pop</small></figcaption></figure>
+    <figure><img src="img/look_serif.jpg" alt="Magazine Serif: elegant italic captions" loading="lazy"><figcaption>5 · Magazine Serif<small>elegant italic</small></figcaption></figure>
+    <figure><img src="img/look_fire.jpg" alt="Fire Red: white capitals, red key word" loading="lazy"><figcaption>6 · Fire Red<small>bold red accent</small></figcaption></figure>
+  </div>
+  <p class="note">Previews of the look. Every real clip places the words around the speaker's face automatically. Change anything later just by saying it ("bigger captions", "no capitals").</p>
+</section>
+
+<!-- STEP 4 -->
+<section class="step" id="card4">
+  <div class="top"><div class="num">4</div><h2>Connect your accounts</h2><div class="time">10 min</div></div>
+  <div class="who">
+    <div class="you"><b>You</b> · Click <b>Connect</b> next to each platform and log in. Four logins, done.</div>
+    <div class="cl"><b>Claude</b> · Sets up the posting service and links it to your factory.</div>
+  </div>
+  <div class="screen"><div class="cap">What you'll see: Easy route (recommended)</div>
+    <div class="plats">
+      <div class="plat"><div class="dot ig"></div>Instagram<br><span class="btn gh pulse">Connect</span></div>
+      <div class="plat"><div class="dot fb"></div>Facebook<br><span class="btn gh">Connect</span></div>
+      <div class="plat"><div class="dot yt"></div>YouTube<br><span class="btn gh">Connect</span></div>
+      <div class="plat"><div class="dot tt"></div>TikTok<br><span class="btn gh">Connect</span></div>
+    </div>
+    <p class="note"><span class="chip">Easy</span> all four post by themselves, TikTok included, through an approved posting service, about $16–24 a month.<br>
+    <span class="chip" style="background:var(--line);color:var(--soft)">Free</span> Instagram + Facebook post by themselves; YouTube and TikTok are one tap from your panel while their approvals run.</p>
+  </div>
+</section>
+
+<!-- STEP 5 -->
+<section class="step" id="card5">
+  <div class="top"><div class="num">5</div><h2>Your link, sent automatically</h2><div class="time">5 min</div></div>
+  <div class="who">
+    <div class="you"><b>You</b> · Comment your word from a second account to test it. Watch the DM arrive.</div>
+    <div class="cl"><b>Claude</b> · Builds the "comment → DM" rule in your Meta inbox, then proves it works with you.</div>
+  </div>
+  <div class="screen"><div class="cap">The rule Claude builds</div>
+    <div class="rule">
+      <div><b>When someone comments</b>MONEY · money</div>
+      <div><b>Reply in public</b>Just sent it to you - check your messages</div>
+      <div><b>Send privately</b>Here it is: your link · #ad</div>
+    </div>
+  </div>
+  <div class="screen"><div class="cap">What your viewer gets</div>
+    <div class="dm"><div class="bub them">MONEY</div><div class="bub me">Here it is: your-link.com 🎁<br>#ad, I earn a commission if you buy through my link.</div></div>
+  </div>
+</section>
+
+<!-- STEP 6 -->
+<section class="step" id="card6">
+  <div class="top"><div class="num">6</div><h2>Switch it on</h2><div class="time">2 min</div></div>
+  <div class="who">
+    <div class="you"><b>You</b> · Nothing.</div>
+    <div class="cl"><b>Claude</b> · Starts your first batch, and sets the weekly "plan" routine that chooses your clips forever.</div>
+  </div>
+  <div class="screen"><div class="cap">What you'll see</div>
+    <div class="ghbar"><span class="btn ghost">Actions</span><span class="arrow">→</span><span class="btn ghost">factory</span><span class="arrow">→</span><span class="btn gh pulse">Run workflow</span></div>
+  </div>
+</section>
+
+<!-- STEP 7 -->
+<section class="step" id="card7">
+  <div class="top"><div class="num">7</div><h2>Done: your control panel</h2><div class="time">1 min</div></div>
+  <ul class="done">
+    <li><span class="ok">✓</span> Your factory exists, and your panel opens</li>
+    <li><span class="ok">✓</span> Your style, voice, topics and word are saved</li>
+    <li><span class="ok">✓</span> Your accounts are connected and post by themselves</li>
+    <li><span class="ok">✓</span> Comment → DM tested: the DM arrived</li>
+    <li><span class="ok">✓</span> First clips arrive in 1–3 hours; new ones every week</li>
+  </ul>
+  <p class="note">Bookmark your panel. Want a change? Just tell your Claude in plain words: "more real estate", "yellow captions", "post 3 a day".</p>
+</section>
+
+<p class="foot">Built and proven on a live account first: 214,805 views on one reel · 6 posts a day across four platforms · no servers.</p>
+</div>
+</body>
+</html>

@@ -96,9 +96,10 @@ def instagram_comments(ig, tok):
     for m in media:
         if _ts(m["timestamp"]) < datetime.now(timezone.utc) - WINDOW - timedelta(days=30):
             continue
-        cs = _get(f"{G}/{m['id']}/comments", {"fields": "id,text,timestamp,username",
+        cs = _get(f"{G}/{m['id']}/comments", {"fields": "id,text,timestamp,username,replies{username}",
                                                "limit": 50, "access_token": tok}).get("data", [])
-        out += [(c["id"], c.get("text", ""), c["timestamp"], m["id"], c.get("username", ""))
+        out += [(c["id"], c.get("text", ""), c["timestamp"], m["id"], c.get("username", ""),
+                 {r.get("username", "") for r in (c.get("replies") or {}).get("data", [])})
                 for c in cs]
     return out
 
@@ -112,7 +113,7 @@ def facebook_comments(page, tok):
                                               "limit": 50, "filter": "stream",
                                               "access_token": tok}).get("data", [])
         out += [(c["id"], c.get("message", ""), c["created_time"], v["id"],
-                 (c.get("from") or {}).get("id", "")) for c in cs]
+                 (c.get("from") or {}).get("id", ""), set()) for c in cs]
     return out
 
 
@@ -166,8 +167,15 @@ def run(dry=False):
             d["errors"].append({"at": now.isoformat(), "platform": platform, "error": str(e)})
             print(f"{platform}: could not read comments - {e}")
             continue
-        for cid, body, when, post, author in comments:
+        for cid, body, when, post, author, repliers in comments:
             if cid in d["sent"] or cid in d["seen"] or author in me:
+                continue
+            # ALREADY ANSWERED BY THE ACCOUNT ITSELF (14 Oct 2026). Meta's own comment
+            # rule replies in public ("Just sent it to you") as it sends its DM. If that
+            # rule is working, this comment is taken care of - two DMs to one person is
+            # the one mistake this must never make.
+            if repliers & me:
+                d["seen"][cid] = now.isoformat()
                 continue
             d["seen"][cid] = now.isoformat()
             kw = matched(body, kws)

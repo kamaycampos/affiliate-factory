@@ -1,10 +1,15 @@
 {
- "version": "1.1.0",
+ "version": "1.2.0",
  "upstream": "kamaycampos/affiliate-factory",
  "changes": [
-  "Your own control panel: clips, sources, style, voice, stats, updates",
-  "Full style control: colours, shadow, capitals, timing, your own font",
-  "Examples you love now teach your next plan",
-  "Default affiliate disclosure and the FDA line for health posts"
+  "ONE setup file: THE_AFFILIATE_FACTORY.md - give it to your Claude, 30 minutes, you only log in, click Allow and choose",
+  "Visual guide: one picture per step, and your style picked from 6 real looks",
+  "Easy route: all four platforms post by themselves through Upload-Post, TikTok included - no developer apps",
+  "Kevin's newest episode is cut first, the same day it appears",
+  "Comment -> DM never sends twice when Meta's own rule already answered",
+  "Captions: one question per post, the comment word matches the clip, flagged words softened",
+  "Newest caption engine: timing anchored to the voice, fewer good clips thrown away as 'scrambled'",
+  "Top resolution: an episode below Rumble's best is fetched again",
+  "No more daily 'Run failed' emails when TikTok is not connected"
  ]
 }

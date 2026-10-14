@@ -1,5 +1,7 @@
 # The Affiliate Factory
 
+> **New: one file does it all.** Give [`THE_AFFILIATE_FACTORY.md`](THE_AFFILIATE_FACTORY.md) to your Claude and say *Set me up*. About 30 minutes; you only log in, click Allow and choose. See every step in pictures: [the visual guide](https://kamaycampos.github.io/affiliate-factory/start/).
+
 **Your own clip studio for Kevin Trudeau's content. You choose the message, and Claude and this machine make the clips.**
 
 It finds the strongest moments in Kevin's episodes and cuts them to full-screen 9:16. It burns in a six-word hook and captions timed to every word, writes the post caption, and schedules everything. With autopilot on, it posts to Instagram, Facebook, YouTube and TikTok by itself. It runs on GitHub for free. All you pay for is Claude Pro.

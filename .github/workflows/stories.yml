@@ -17,6 +17,8 @@ permissions:
 concurrency:
   group: stories
   cancel-in-progress: false
+env:
+  KT_LOCK_REPO: ${{ github.repository }}       # this copy's own posting record
 jobs:
   cut:
     if: github.repository != 'kamaycampos/affiliate-factory'

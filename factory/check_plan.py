@@ -43,6 +43,45 @@ def lint(h, b):
         print(f"(hook lint failed on {h}: {type(e).__name__}; using the core rules)")
         return _core(h, b)
 
+# NO STAKES, NO HOOK. 5 Oct 2026, Kamay sent "WHY IT TOOK HER / 3 HOURS" (Ep. 86,
+# KAMAY's account): "its so stupid, so useless... if i read that hook i absolutely pass
+# by because it doesnt give me anything." It passed every rule above: opens on Why,
+# carries a number, six words. A number is only a promise when it is attached to
+# something the viewer wants, fears or recognises - "3 hours" of a stranger's walk is
+# trivia. Same failure as "What a stranger / told him" and "The dog on / the nail".
+# The hook must hold at least one of: the viewer (you/your), money or status, a loss
+# or a cost, a result, or a named person/brand. KT brands get it as a rule. Yaren's stab rule is
+# her own, and this word list is tuned to the money lane - so for AR_ it WARNS and never
+# blocks (Kamay, 5 Oct: "merge for all projects"; it flags "Color came back / in one
+# exhale" and "Ten strangers waited / in the basement", but also "Show me where / God
+# is not", which is hers and good). Against the 152 KT hooks planned to 5 Oct this flags 40, and they are
+# the weak ones ("Why it took her 3 hours", "The camping trip that changed everything").
+STAKES = re.compile(
+    r"(\byou\b|\byour\b|\byou'?re\b|[$%]|\bdollar|\bmillion|\bbillion|\bthousand|"
+    r"\brich|\bwealth|\bmoney|\bbroke|\bpoor|\bcash|\bincome|\bdebt|\bsales|\bprofit|"
+    r"\bfortune|\bpaid|\bpay|\bfinanc|\bfreedom|\bmansion|\binvest|\bbusiness|\bpower|"
+    r"\bsuccess|\bmillionaire|\bbillionaire|\bwin\b|\bwon\b|\bwinners?\b|\bfail|\blost\b|"
+    r"\blos(e|es|ing)\b|\bcancer|\bheal|\bprison|\bdied|\bdeath|\bfired|\bbanned|\bsued|\bhabit|"
+    r"\bfear|\bpain|\bsuffer|\bsecret|\blie\b|\bmistake|\bnever|\bstop|\bwork(s|ing)?\b|"
+    r"\bmanifest)", re.I)
+
+
+def no_stakes(h, b):
+    t = " ".join(h)
+    named = any(re.search(r"(?<!^)\b[A-Z][a-z]{2,}", l.strip()) for l in h)
+    if STAKES.search(t) or named:
+        return None
+    return ("no stakes - names nothing the viewer gets, fears or recognises. A number "
+            "alone is trivia (\"Why it took her / 3 hours\"). Hook the money, the cost, "
+            "the result, or say it to YOU")
+
+
+# The merge job DELETES a plan that fails. A wording judgement must never throw an
+# episode away there, so it only warns there (HOOK_STAKES=warn); the planner, which
+# can rewrite, gets it as an error.
+STAKES_WARN = os.environ.get("HOOK_STAKES") == "warn"
+
+
 # WORD OVEREXPOSURE. A hook word that appears in more than a third of recent
 # posts has stopped differentiating anything - it sits in the winners and the
 # losers alike, so it can no longer be why either happened. Retire it for a
@@ -78,6 +117,12 @@ tired = overexposed(recent_hooks())
 if tired:
     print("worn-out hook words (in over a third of recent posts): "
           + ", ".join(f"{w} x{k}" for w, k in sorted(tired.items(), key=lambda x: -x[1])))
+WIND_UP = re.compile(
+    r"(well|so|and|but|now|because|okay|ok|um|uh|look|listen|anyway|alright|all right)\b"
+    r"|let me (tell|explain|show)|here'?s the thing|the reason (is|why)|that'?s why"
+    r"|there'?s (two|three|four|five|six|seven|\d+) (reasons|things|ways|steps|keys)"
+    r"|there are (two|three|four|five|six|seven|\d+) (reasons|things|ways|steps|keys)"
+    r"|(first|number one|step one)\b", re.I)
 others = {}
 for f in os.listdir(os.path.join(HERE, "plans")):
     if f.endswith(".json") and not f.startswith("_"):
@@ -103,15 +148,31 @@ for path in sys.argv[1:]:
         if not re.fullmatch(r"[A-Z0-9]+(-[A-Z0-9]+)*", s): errs.append(f"{s}: slug must be UPPER-DASHED")
         if not MIN_LEN <= d <= MAX_LEN: errs.append(f"{s}: length {d:.0f}s outside {MIN_LEN:.0f}-{MAX_LEN:.0f}")
         for e in lint(c.get("hook") or [], b): errs.append(f"{s}: hook - {e}")
+        ns = no_stakes(c.get("hook") or [], b)
+        if ns and (STAKES_WARN or fam == "AR"): print(f"   ~ {s}: hook - {ns}")
+        elif ns: errs.append(f"{s}: hook - {ns}")
         worn = [w for w in re.findall(r"[a-z']+", " ".join(c.get("hook") or []).lower()) if w in tired]
         if worn: errs.append(f"{s}: hook leans on worn-out word(s): {', '.join(sorted(set(worn)))}")
         cap = c.get("caption", "")
+        # Words the platforms' filters read as an income/health guarantee or spam bait.
+        # A warning, not a refusal: the poster softens them anyway (poster.soften).
+        flag = re.findall(r"\b(guaranteed|get rich quick|free money|risk[- ]free|miracle|cures?|"
+                          r"100% (?:guaranteed|sure)|click (?:the|my) link|dm me)\b", cap, re.I)
+        if flag and fam == "KT":
+            print(f"   ~ {s}: caption uses words platforms flag ({', '.join(sorted(set(f.lower() for f in flag)))}) - reword")
         if not 300 <= len(cap) <= 750: errs.append(f"{s}: caption {len(cap)} chars (want 400-600)")
         if "#kevintrudeau" not in cap: errs.append(f"{s}: caption needs #kevintrudeau")
         if c.get("cta_kind") not in (None, "offer"): errs.append(f"{s}: cta_kind must be 'offer' or absent")
         for k in ("start_words", "end_words"):
             n = len(str(c.get(k) or "").split())
             if not 2 <= n <= 8: errs.append(f"{s}: {k} must be the clip's exact first/last 3-5 words")
+        # NO WIND-UP AT SECOND ZERO (11 Oct 2026). "THE BRAINWAVE ONLY THE RICH USE" opened on
+        # "There's three reasons why..." - the hook promised the brainwave and the brainwave
+        # arrived two minutes later. Kamay: "completely bad taken, it brokens the rule that
+        # the most important of every single clips are the first 3 seconds." A list intro,
+        # a filler word or a pointer back is the wind-up BEFORE the line; open on the line.
+        if fam == "KT" and WIND_UP.match(str(c.get("start_words") or "").strip()):
+            errs.append(f"{s}: opens on a wind-up ('{c.get('start_words')}') - start on the sharpest line itself (FIRST_3_SECONDS.md)")
     print(f"{name}: {'OK' if not errs else 'PROBLEMS'} ({len(slugs)} clips)")
     for e in errs: print("   -", e)
     bad += bool(errs)

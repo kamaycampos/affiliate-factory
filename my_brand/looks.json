@@ -1,0 +1,10 @@
+{
+ "_help": "The six starting looks shown as pictures in the visual guide (docs/start/, card 3). When the member picks one, copy its settings into my_brand/style.json. They can change any detail afterwards by talking ('bigger captions', 'no capitals'). Playfair Display is SIL Open Font License (free to use and share).",
+ "bold":  {"name": "Bold & Bright",  "accent_color": "#FFE500", "text_color": "white", "shadow": "heavy",   "uppercase": true},
+ "gold":  {"name": "Gold Luxe",      "accent_color": "#E8B34B", "text_color": "white", "shadow": "heavy",   "uppercase": true},
+ "clean": {"name": "Clean & Calm",   "accent_color": "white",   "text_color": "white", "shadow": "soft",    "uppercase": false, "accent_captions": false},
+ "neon":  {"name": "Neon Energy",    "accent_color": "#39FF88", "text_color": "white", "shadow": "outline", "uppercase": true},
+ "serif": {"name": "Magazine Serif", "accent_color": "#E8B34B", "text_color": "#FAF3E6", "shadow": "soft", "uppercase": false,
+           "font_file": "my_brand/fonts/PlayfairDisplay-Italic.ttf"},
+ "fire":  {"name": "Fire Red",       "accent_color": "#FF3B30", "text_color": "white", "shadow": "heavy",   "uppercase": true}
+}

@@ -22,6 +22,7 @@ concurrency:
   group: factory
   cancel-in-progress: false
 env:
+  KT_LOCK_REPO: ${{ github.repository }}       # this copy's own posting record
   FACTORY_KEY: ${{ secrets.FACTORY_KEY }}
   TRANSCRIPT_KEY: ${{ secrets.TRANSCRIPT_KEY }}
   GH_TOKEN: ${{ github.token }}

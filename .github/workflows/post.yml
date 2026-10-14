@@ -40,6 +40,8 @@ permissions:
   contents: write               # to commit the state file back
   issues: write                 # queue_alarm.py emails Kamay via an issue
 
+env:
+  KT_LOCK_REPO: ${{ github.repository }}       # this copy's own posting record
 jobs:
   post:
     if: github.repository != 'kamaycampos/affiliate-factory'
@@ -98,6 +100,10 @@ jobs:
           DISCLOSURE: ${{ vars.DISCLOSURE || '#ad - I earn a commission if you buy through my link.' }}
           KIT_STUDIO: ${{ vars.AUTOPOST != 'on' && '1' || '0' }}
           KT_PLATFORMS: ${{ secrets.KT_PLATFORMS }}
+          UPLOADPOST_API_KEY: ${{ secrets.UPLOADPOST_API_KEY }}      # the Easy route (THE_AFFILIATE_FACTORY.md step 4)
+          UPLOADPOST_USER: ${{ secrets.UPLOADPOST_USER }}
+          UPLOADPOST_PLATFORMS: ${{ vars.UPLOADPOST_PLATFORMS }}
+          UPLOADPOST_FB_PAGE: ${{ vars.UPLOADPOST_FB_PAGE }}
           KT_CTA_KEYWORDS: ${{ secrets.KT_CTA_KEYWORDS }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
