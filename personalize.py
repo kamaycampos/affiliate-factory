@@ -74,10 +74,23 @@ def main():
     rehash_shared(HERE)
     print(f"Your machine now knows it is {repo} ({changed} files).")
     print()
-    print("Two secrets to paste. Repo -> Settings -> Secrets and variables -> Actions -> New repository secret")
-    print(f"  FACTORY_KEY      {secrets.token_urlsafe(32)}")
-    print(f"  TRANSCRIPT_KEY   {secrets.token_urlsafe(32)}")
-    print(f"  OFFER_URL        <your affiliate link>")
+    # THE KEYS ARE NEVER PRINTED (15 Oct 2026, WB rehearsal). They go to a private file
+    # on this computer - `plan` needs TRANSCRIPT_KEY to read the transcripts - and
+    # straight into GitHub's secrets with `gh`. A key printed into a chat is a leaked key;
+    # a key stored only in GitHub is one `plan` can never use.
+    keys = os.path.expanduser(f"~/.{name}.keys")
+    if not os.path.exists(keys):
+        old = os.umask(0o077)
+        open(keys, "w").write(f"FACTORY_KEY={secrets.token_urlsafe(32)}\nTRANSCRIPT_KEY={secrets.token_urlsafe(32)}\n")
+        os.umask(old)
+    os.chmod(keys, 0o600)
+    vals = dict(l.split("=", 1) for l in open(keys).read().split() if "=" in l)
+    stored = []
+    for k in ("FACTORY_KEY", "TRANSCRIPT_KEY"):
+        r = subprocess.run(["gh", "secret", "set", k, "-R", repo], input=vals[k].encode(), capture_output=True)
+        stored.append(k if r.returncode == 0 else f"{k} (NOT stored - run `gh auth login --web` and re-run)")
+    print(f"Keys saved privately in {keys} (only you can read it) and stored in GitHub: {', '.join(stored)}")
+    print("Still to set: OFFER_URL (their affiliate link):  gh secret set OFFER_URL")
     print()
     print("Then: Settings -> Pages -> Deploy from a branch -> main, /docs -> Save")
     print(f"Your board will live at https://{pages}/")

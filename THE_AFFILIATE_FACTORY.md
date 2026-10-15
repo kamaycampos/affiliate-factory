@@ -83,7 +83,7 @@ Check each one yourself before you say "done". Don't take a tool's word for it: 
 - `[You]` Clone it into the folder you're working in, then read its `CLAUDE.md`. From now on, follow that file's `start` section **in the order and style of this document**.
 
 ### Step 2: The keys and the control panel (3 min) · *Card 2*
-- `[You]` Run `python3 personalize.py`, then store `FACTORY_KEY` and `TRANSCRIPT_KEY` with `gh secret set` straight from a generator (never printed), and `OFFER_URL` (their affiliate link) the same way.
+- `[You]` Run `python3 personalize.py`. It saves `FACTORY_KEY` and `TRANSCRIPT_KEY` in a private file on their computer (`~/.my-factory.keys`; `plan` reads transcripts with it) and stores both in GitHub. Never print them. Then `gh secret set OFFER_URL` with their affiliate link.
 - `[You]` Turn on Pages: `gh api -X POST repos/OWNER/my-factory/pages -f "source[branch]=main" -f "source[path]=/docs"`.
 - `[You]` Tell them: *"Your factory has its own page now. I'll open it for you at the end."*
 
