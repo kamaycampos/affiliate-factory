@@ -47,7 +47,8 @@ Check each one yourself before you say "done". Don't take a tool's word for it: 
 - [ ] Their own copy of the factory exists in **their** GitHub, and their control panel opens in the browser
 - [ ] Their brand file holds their name, voice, lane and keyword (read it back to them)
 - [ ] Their style is chosen, and they have **seen** what a clip will look like
-- [ ] Instagram, Facebook and YouTube post automatically; TikTok drafts arrive ready to tap
+- [ ] Instagram, Facebook and YouTube post automatically; TikTok clips land in their TikTok inbox, with each caption ready to copy on their Captions board
+- [ ] `check_keys` prints all four account names, no FAILED
 - [ ] Comment → DM answers their keyword (prove it: comment the keyword from a second account and watch the DM arrive)
 - [ ] The first factory run has started (the first clips arrive in 1–3 hours)
 - [ ] The weekly planning routine exists on their Claude account
@@ -60,7 +61,8 @@ Check each one yourself before you say "done". Don't take a tool's word for it: 
 2. **One step per message.** Say what's about to happen in one sentence, do it, and confirm it worked in one sentence. Show a progress bar like `Step 3 of 7 ▓▓▓░░░░`.
 3. **They only do three kinds of things:** log in (they type their own passwords; **you never type a password, code or card number**), click **Allow / Continue / Approve**, and choose. Everything else is yours.
 4. **You drive their Chrome** with Claude in Chrome. Ask once at the start: *"May I use your Chrome to set everything up? You'll approve each log-in."* If Claude in Chrome isn't connected, help them install it first (step 0). It's the difference between 30 minutes and 3 hours.
-5. **Never paste a key, token or password into the chat.** Secrets go straight into GitHub's secret settings, by you, in their browser.
+5. **No key, token or password ever passes through the chat, and you never type one.** Every key goes in through a **paste prompt in their Terminal panel** that you open for them (`meta_key.py`, `yt_key.py`, `tiktok_key.py` in their repo): they copy the key from the website, click into the Terminal tab, paste, press Enter. The script stores it in GitHub and prints only the account name it reached. Tell them exactly: *"Click the ⌄ / copy icon next to X, then click inside the Terminal tab called Y, Cmd+V, Enter. Nothing shows while you paste."*
+8. **Keep the Chrome window you are driving in front.** A Chrome window hidden behind others stops responding to clicks (Google Cloud forms freeze). If a page stops reacting, ask them to bring that window to the front and leave it there.
 6. **Watch the clock.** Each step below has a time budget. If a step runs over by 5 minutes, stop, say plainly what's blocking, offer the simplest way around it, and keep going.
 7. **Never leave them on a dead end.** If something can't be done today (an app approval, a waiting period), say exactly what happens instead and when. Then move on.
 
@@ -72,6 +74,7 @@ Check each one yourself before you say "done". Don't take a tool's word for it: 
 ### Step 0: Ready check (2 min)
 - `[You]` Confirm you're in the Claude app's **Code** tab on their computer, and that Claude in Chrome is connected.
 - If Claude in Chrome isn't connected: send them **chromewebstore.google.com/detail/claude/fcoeoabgfenejglbffodgkkbkcdhcgfn**. `[Them]` click **Add to Chrome**, then sign in.
+- `[You]` Install GitHub's free command tool **`gh`** if missing (Mac: download the latest `gh_*_macOS_universal.zip` from github.com/cli/cli/releases into `~/bin` and add it to PATH; Windows: `winget install GitHub.cli`). Then run `gh auth login --web` in a Terminal tab. `[Them]` copy the 8-character code it shows, click **Authorize**. The key scripts need it.
 - `[Them]` Have ready: their KT affiliate link (from the affiliate portal), and the logins for their Instagram, Facebook, YouTube and TikTok.
 
 ### Step 1: Their own factory (4 min) · *Card 1*
@@ -80,8 +83,8 @@ Check each one yourself before you say "done". Don't take a tool's word for it: 
 - `[You]` Clone it into the folder you're working in, then read its `CLAUDE.md`. From now on, follow that file's `start` section **in the order and style of this document**.
 
 ### Step 2: The keys and the control panel (3 min) · *Card 2*
-- `[You]` Run `python3 personalize.py`. Put `FACTORY_KEY`, `TRANSCRIPT_KEY` and `OFFER_URL` (their affiliate link) into **Settings → Secrets and variables → Actions**, yourself, in their browser.
-- `[You]` Turn on **Settings → Pages → Deploy from a branch → main / docs**.
+- `[You]` Run `python3 personalize.py`, then store `FACTORY_KEY` and `TRANSCRIPT_KEY` with `gh secret set` straight from a generator (never printed), and `OFFER_URL` (their affiliate link) the same way.
+- `[You]` Turn on Pages: `gh api -X POST repos/OWNER/my-factory/pages -f "source[branch]=main" -f "source[path]=/docs"`.
 - `[You]` Tell them: *"Your factory has its own page now. I'll open it for you at the end."*
 
 ### Step 3: Their style, from pictures (5 min) · *Card 3*
@@ -96,9 +99,21 @@ Ask **one question at a time**, always with **pictures or examples** to choose f
 
 ### Step 4: Connect the platforms (15 min) · *Card 4*
 **Everything here is free. Their only cost is Claude Pro.** Do it in this order:
-- **Instagram + Facebook (one Meta setup covers both):** follow `SETUP_META.md` yourself, in their Chrome (Meta app, Page token). `[Them]` click **Continue as…** and **Allow**. From then on, both post by themselves.
-- **YouTube:** follow the YouTube part of `SETUP_POSTING.md` yourself (Google Cloud project, YouTube Data API, consent screen **published to Production**, token). `[Them]` click **Allow**. YouTube then posts by itself. If Google ever keeps a new project's uploads private, fill in Google's free YouTube API review form with them; until it passes, those clips are one tap from the panel.
-- **TikTok:** clips arrive in their **TikTok drafts** with the caption ready, and they tap **Post**. TikTok doesn't approve personal posting apps yet. Tell them plainly that this is the one tap that stays.
+- **Instagram + Facebook (one Meta setup, ~6 min):**
+  1. `[Them]` Instagram must be **Professional** and **linked to their Facebook Page**. Check in **business.facebook.com**: if it shows **Connect Instagram** under their Page name, `[Them]` click it and log in to Instagram. In the Instagram app: Settings → Messages and story replies → Message controls → **Allow access to messages** ON.
+  2. `[Them]` **developers.facebook.com → Get started** (they accept Meta's terms and verify their phone). If Meta says the phone number is already used, it belongs to another developer account of theirs: use that account's app instead.
+  3. `[You]` **My Apps → Create app → Other → Business**, name it `My Factory`. Open **Graph API Explorer**, pick their app, tick: `pages_show_list, pages_read_engagement, pages_manage_posts, business_management, instagram_basic, instagram_content_publish, instagram_manage_comments, instagram_manage_insights, instagram_manage_messages`.
+  4. `[Them]` **Generate Access Token → Continue as… → tick THEIR Page and THEIR Instagram** (check the ID numbers if two pages look alike) **→ Save**. If their Page or Instagram is missing from that list, close it, reload, and generate again.
+  5. `[You]` Open a Terminal tab running `python3 meta_key.py <APP_ID>`. `[Them]` paste the **App secret** (App settings → Basic → Show), then the **token** from the Explorer. It prints their Page and @Instagram name.
+- **YouTube (~8 min), in the Chrome that is logged in to their YouTube:**
+  1. `[You]` console.cloud.google.com → new project `my-factory` (`[Them]` accept Google Cloud's terms if asked). Enable **YouTube Data API v3** AND **YouTube Analytics API**, and re-open each to confirm it says **Enabled**.
+  2. `[You]` Google Auth Platform → Get started: app name `My Factory`, their email, **External**, their email again; `[Them]` tick the User Data Policy → **Create**. **Branding:** home page = their panel `https://OWNER.github.io/my-factory/`, privacy = `…/legal/privacy.html`, terms = `…/legal/terms.html`, authorized domain = `OWNER.github.io` → Save. **Audience → Publish app → Confirm** (in Testing, the key dies after 7 days).
+  3. `[You]` **Clients → Create client → Desktop app → Create.** Read the Client ID off the dialog. Open a Terminal tab running `python3 yt_key.py <CLIENT_ID>`. `[Them]` click the copy icon next to **Client secret**, paste it in the Terminal tab, Enter. `[You]` open the link in `.yt_auth_url` in their Chrome. `[Them]` pick their account (and channel), **Advanced → Go to My Factory** if Google warns, tick all → **Continue**. It prints their channel name.
+- **TikTok (~6 min): clips land in their TikTok app INBOX; they open it, paste the caption from their panel's Captions board, tap Post.** TikTok does not approve personal posting apps, so their own app stays in **Sandbox**, which is enough for inbox drafts:
+  1. `[Them]` log in at **developers.tiktok.com** (their TikTok account) and accept the terms. `[You]` **Manage apps → Connect an app**, name it `My Factory`, switch to **Sandbox** (create one). Add products **Login Kit** (Web redirect URI = their panel `https://OWNER.github.io/my-factory/`) and **Content Posting API** (Upload to TikTok); scopes `user.info.basic, user.info.profile, user.info.stats, video.list, video.upload`. **Apply changes.**
+  2. **Sandbox settings → Target users → Add account → Continue.** `[Them]` log in as **their** TikTok account in the window that opens. Their @name must appear in the list.
+  3. `[You]` open a Terminal tab running `python3 tiktok_key.py <SANDBOX_CLIENT_KEY>` (the key is under Sandbox → Credentials; it starts with `sb`). `[Them]` copy the **Client secret** (⌄ next to it), paste in the Terminal tab, Enter. `[You]` open the link in `.tt_auth_url`. `[Them]` **Authorize**, then copy the address bar of the page they land on and paste it in the Terminal tab, Enter. It prints their @TikTok name.
+- **Prove all four at once:** `gh workflow run check_keys.yml`, then read its log. It must print their Instagram, Facebook Page, YouTube channel and TikTok name. Anything that prints FAILED is not done.
 
 Then `[You]` set the repository **variable** `AUTOPOST` = `on`, and the secret `KT_PLATFORMS` = the platforms you connected (e.g. `instagram,facebook,youtube,tiktok`).
 
@@ -106,15 +121,16 @@ Then `[You]` set the repository **variable** `AUTOPOST` = `on`, and the secret `
 **Meta's own rule is the way: it answers in seconds, publicly and by DM.** Set it up first, always.
 - `[You]` Open **business.facebook.com → Inbox → Automations → Create automation → Comment to message**. It's built into Meta, free, and needs no app.
   - Channels: Instagram and Facebook
-  - Keywords: their word, in capitals and lowercase (e.g. `MONEY`, `money`)
+  - Keywords: their word, in capitals and lowercase (e.g. `MONEY`, `money`). Type one word, then **click the suggestion under the box** to make it a chip. Pressing Enter merges every word into one chip ("MONEYmoney"), which never matches.
+  - If the page shows **Connect Instagram** under their Page name, the Instagram account isn't linked yet: `[Them]` click it and log in to Instagram first, or Instagram comments never trigger the rule.
   - Private message: *"Here it is: {their link} - #ad, I earn a commission if you buy through my link."*
-  - Public reply: *"Just sent it to you - check your messages"*
+  - Comment reply (Meta pre-fills "Sent you a message!"): replace it with *"Just sent it to you - check your messages"*
   - Save, then **reload the page** and confirm the rule shows as ON.
 - **Backup only:** if Meta's rule stays silent (it can stop if Meta ever restricts the Page), turn the rule OFF and switch on the factory's own DM bot (`DM_AUTO` = `on`; the Page token needs `pages_messaging` and `instagram_manage_messages`). It answers within minutes, not seconds. **Use one system, never both**, or people get two DMs.
 - **Prove it:** ask them to comment the keyword from another account (a friend or a second profile) on any post, and watch the DM arrive together. If it doesn't arrive in 2 minutes, say exactly why. Don't leave it.
 
 ### Step 6: Switch it on, and the weekly brain (2 min) · *Card 6*
-- `[You]` Start their first factory run: **Actions → factory → Run workflow**. The first clips arrive in 1–3 hours.
+- `[You]` Start their first factory run: `gh workflow run factory.yml`. It stocks and transcribes their first episodes (1–3 hours). When it is done, run `plan` once yourself (a new factory has an empty month list; `CLAUDE.md` → `plan` explains it), so the first clips are built the same day.
 - `[You]` Create a **weekly scheduled routine** on their Claude account (Monday morning, their time) on this repository, with the prompt `plan, then report`. If routines aren't available on their plan, tell them the one sentence that replaces it: say **plan** once a week.
 
 ### Step 7: The finish line (1 min) · *Card 7*

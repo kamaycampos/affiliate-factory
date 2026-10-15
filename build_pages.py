@@ -49,7 +49,7 @@ def esc(t):
 def calendar_ics(cs):
     out = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//kt-machine//EN",
            "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
-           "X-WR-CALNAME:Posts - Kamay + Awakened Rise",
+           "X-WR-CALNAME:My posts",
            "X-WR-TIMEZONE:" + TZ,
            "REFRESH-INTERVAL;VALUE=DURATION:PT30M", "X-PUBLISHED-TTL:PT30M"]
     now = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
@@ -59,7 +59,7 @@ def calendar_ics(cs):
         if not start:
             continue
         f = c["file"]
-        who = "AWAKENED RISE" if f.startswith("AR_") else "KAMAY"
+        who = "MY CLIPS"
         live = bool(c.get("posted_at"))
         cap = (c.get("caption") or "").strip().splitlines()
         title = cap[0] if cap else f.split("/")[-1]
@@ -106,10 +106,10 @@ def queue_alarm_events(cs, now):
                 "DTEND;VALUE=DATE:" + (day + timedelta(days=1)).strftime("%Y%m%d"),
                 "SUMMARY:" + esc(text), "TRANSP:TRANSPARENT", "END:VEVENT"]
     ev += allday("queue-runout-kamay", runs_out,
-                 f"!! KAMAY - NO CLIPS LEFT TO POST ({len(left)} queued before this)")
+                 f"!! NO CLIPS LEFT TO POST ({len(left)} queued before this)")
     if days <= 3:
         ev += allday("queue-warning-kamay", today,
-                     f"!! KAMAY - clips run out in {days} day(s), on {runs_out:%a %d %b} - make more")
+                     f"!! Clips run out in {days} day(s), on {runs_out:%a %d %b} - make more")
     return ev
 
 
@@ -212,8 +212,8 @@ def board(cs):
 
     def card(c, is_ready):
         f = c["file"]
-        who = "AWAKENED RISE" if f.startswith("AR_") else "KAMAY"
-        key = "AR" if f.startswith("AR_") else "KAMAY"
+        who = "MY CLIPS"
+        key = "ME"
         when = c.get("posted_at") or c.get("scheduled_at")
         tag = "READY TO POST" if is_ready else (
             "posted" if c.get("posted_at") else "scheduled")
@@ -241,9 +241,7 @@ def board(cs):
     p = ["<meta charset=utf-8><meta name=viewport "
          "content='width=device-width,initial-scale=1'><title>Captions</title>",
          f"<style>{css}</style>", "<h1>Captions</h1>",
-         "<div><button class='pick on' onclick=\"pick('all',this)\">All</button>"
-         "<button class='pick' onclick=\"pick('KAMAY',this)\">Kamay</button>"
-         "<button class='pick' onclick=\"pick('AR',this)\">Awakened Rise</button></div>",
+         "<div></div>",
          "<div><a href='descriptions.html' style='color:#f5c542'>"
          "All descriptions &rarr;</a></div>",
          f"<h2>READY TO POST ON TIKTOK &middot; {len(todo)}</h2>"]
@@ -251,7 +249,7 @@ def board(cs):
     hers = [c for c in todo if c["file"].startswith("AR_")]
     if not todo:
         p += ["<div class=c>Nothing waiting.</div>"]
-    for title, group in (("KAMAY", mine), ("AWAKENED RISE", hers)):
+    for title, group in (("MY CLIPS", mine + hers),):
         if group:
             p += [f"<h2>{title} &middot; {len(group)}</h2>"] + [card(c, True) for c in group]
     p += [f"<button class='pick' onclick=\"document.getElementById('more')"
@@ -322,7 +320,7 @@ def archive(cs):
         f = c["file"]
         cid = "a" + str(abs(hash(f)))
         when = c.get("posted_at") or c.get("scheduled_at") or ""
-        who = "AWAKENED RISE" if f.startswith("AR_") else "KAMAY"
+        who = "MY CLIPS"
         state = "posted" if c.get("posted_at") else ("retired" if c.get("done") else "waiting")
         out.append(f"<div class=c><div class=w>{who} &middot; {state} {when}</div>"
                    + (f"<div class=hk>&ldquo;{html.escape(c['hook'])}&rdquo;</div>" if c.get("hook") else "")
