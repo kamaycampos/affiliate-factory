@@ -26,7 +26,7 @@ You are running a member's copy of **The Affiliate Factory**. It is a clip machi
    6. Which platforms, and what times of day can you post?
 5. Write `my_brand/BRAND.md` from their answers, using the template already in that file. Read it back to them in five lines and ask "anything to change?"
 6. Commit and push. Tell them to open **Actions → factory → Run workflow** once. That stocks their first episodes and transcribes them, which takes 1-3 hours.
-7. **Make the weekly work automatic.** Create a scheduled routine on their Claude account (Claude Code routines / scheduled tasks), weekly, Monday morning their time, on this repository. Its prompt: `plan, then report`. From then on clips are chosen every week without them. If routines are not available on their plan, tell them the one sentence that replaces it: say `plan` once a week.
+7. **Make the weekly work automatic.** Create a weekly scheduled task in their Claude app (local, so it can read `~/.REPO-NAME.keys`): every Monday 9:00 their time, working folder = this repository, prompt `plan, then report`. It runs while the computer is on; if it was off, it runs the next time Claude opens. They can also type `plan` any day.
 
 ### Their control panel
 Their website at `https://YOUR-GITHUB-NAME.github.io/YOUR-REPO/` is the member's control room. It is rebuilt every 20 minutes by `panel/build_panel.py`. It has six rooms:

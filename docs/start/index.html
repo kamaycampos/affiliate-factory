@@ -68,6 +68,20 @@ h2{font-size:26px;margin:0 0 6px}
 .ok{color:var(--ok);font-weight:800}
 .note{font-size:15px;color:var(--soft);margin-top:10px}
 .foot{margin-top:40px;color:var(--soft);font-size:14px;text-align:center}
+.parta{background:var(--youbg);border:1px solid var(--line);border-radius:22px;padding:22px;margin:22px 0}
+.parta h2{margin:0 0 4px}.parta .sub{color:var(--soft);font-size:15px;margin:0 0 14px}
+.a{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
+.a h3{margin:0 0 8px;font-size:18px}.a ol{margin:0 0 6px;padding-left:22px}.a li{margin:4px 0}
+.app{border:1px solid var(--line);border-radius:14px;background:var(--bg);overflow:hidden;margin-top:10px}
+.tabs{display:flex;gap:6px;padding:10px;border-bottom:1px solid var(--line)}
+.tabs span{padding:6px 14px;border-radius:999px;font-size:14px;color:var(--soft)}
+.tabs .on{background:var(--ink);color:var(--bg);font-weight:700}
+.pbox{padding:12px}.pbox .msg{border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--soft);font-size:15px;background:var(--card)}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pills span{font-size:13px;border:1px solid var(--line);border-radius:8px;padding:5px 9px;background:var(--card)}
+.tog{display:inline-flex;align-items:center;gap:10px;font-weight:600}
+.tog i{width:42px;height:24px;border-radius:999px;background:#2fa84f;position:relative;display:inline-block}
+.tog i:after{content:"";position:absolute;right:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff}
 @media (max-width:640px){.three,.targets,.who{grid-template-columns:1fr}.looks{grid-template-columns:repeat(2,1fr)}.plats{grid-template-columns:repeat(2,1fr)}body{font-size:17px}}
 </style>
 </head>
@@ -76,7 +90,7 @@ h2{font-size:26px;margin:0 0 6px}
 
 <div class="kicker">The Affiliate Factory</div>
 <h1>Your clip machine, set up in 30 minutes.</h1>
-<p class="lead">Your Claude does the work. You only do three things: <b>log in</b>, click <b>Allow</b>, and <b>pick what you like</b> from pictures.</p>
+<p class="lead">First you get Claude ready (Part A, about 15 minutes, once). Then your Claude does the work. You only <b>log in</b>, click <b>Allow</b>, <b>choose</b> your style, and <b>paste</b> a key when Claude asks.</p>
 
 <div class="three">
   <div><b>30 min</b><span>of your time, once</span></div>
@@ -112,15 +126,65 @@ h2{font-size:26px;margin:0 0 6px}
   <div class="loop"><span>New Kevin episode</span><i>→</i><span>Best moments chosen</span><i>→</i><span>Your-style clips</span><i>→</i><span>Posted for you</span><i>→</i><span>Comment → DM with your link</span><i>→</i><span>Numbers teach next week</span><i>↺</i></div>
 </section>
 
+<!-- PART A -->
+<section class="parta" id="partA">
+  <h2>Part A · Get Claude ready</h2>
+  <p class="sub">You do this part yourself, once. Cost: Claude Pro, $20 a month. Everything else is free.</p>
+
+  <div class="a"><h3>A1 · Get Claude Pro <span class="time">3 min</span></h3>
+    <ol><li>Open <b>claude.ai</b> and <b>Sign up</b> (Google or email).</li>
+    <li>Your name (bottom left) → <b>Upgrade plan</b> → <b>Pro</b> → pay with your card.</li></ol>
+    <div class="screen"><div class="cap">What you'll see</div><div class="ghbar"><span class="btn ghost">Free</span><span class="btn gh pulse">Pro · $20/month</span><span class="btn ghost">Max</span><span class="arrow">← this one</span></div></div>
+  </div>
+
+  <div class="a"><h3>A2 · Install the Claude app <span class="time">3 min</span></h3>
+    <ol><li>Open <b>claude.ai/download</b> → <b>Download for Mac</b> (or Windows).</li>
+    <li>Mac: open the file, drag <b>Claude</b> into <b>Applications</b>, open it. Windows: run the installer.</li>
+    <li>Sign in with the same account.</li></ol>
+  </div>
+
+  <div class="a"><h3>A3 · Chrome + the Claude extension <span class="time">3 min</span></h3>
+    <ol><li>No Chrome? Install it from <b>google.com/chrome</b>.</li>
+    <li>In Chrome, open the <b>Claude</b> extension page (link in your setup file) → <b>Add to Chrome</b> → <b>Add extension</b>.</li>
+    <li>Puzzle piece (top right) → <b>pin</b> Claude. Click the Claude icon → <b>sign in</b> with the same account.</li></ol>
+    <div class="screen"><div class="cap">What you'll see</div><div class="ghbar"><span class="repo">Claude</span><span class="btn gh pulse">Add to Chrome</span><span class="arrow">→</span><span class="btn ghost">Add extension</span></div></div>
+  </div>
+
+  <div class="a"><h3>A4 · Let Claude work without asking every time <span class="time">1 min</span></h3>
+    <ol><li>Claude app → your name (bottom left) → <b>Settings</b> → <b>Claude Code</b>.</li>
+    <li>Turn <b>on</b>: <b>Allow bypass permissions mode</b>.</li></ol>
+    <div class="screen"><div class="cap">What you'll see</div><span class="tog"><i></i>Allow bypass permissions mode</span></div>
+  </div>
+
+  <div class="a"><h3>A5 · A folder for your factory <span class="time">1 min</span></h3>
+    <ol><li>On your Desktop make a new folder called <b>My Factory</b>.</li>
+    <li>Drag the setup file (<b>THE_AFFILIATE_FACTORY</b>) into it.</li></ol>
+  </div>
+
+  <div class="a"><h3>A6 · Open Claude Code, the right way <span class="time">2 min</span></h3>
+    <ol><li>Click the <b>Code</b> tab at the top (not Chat).</li>
+    <li>Below the message box: <b>Project folder</b> → My Factory · <b>Environment</b> → Local · <b>Model</b> → <b>Opus 5.5</b> · <b>Mode</b> → <b>Bypass permissions</b>.</li></ol>
+    <div class="app"><div class="tabs"><span>Chat</span><span>Cowork</span><span class="on pulse">Code</span></div>
+      <div class="pbox"><div class="msg">Set me up.</div>
+      <div class="pills"><span>📁 My Factory</span><span>Local</span><span class="pulse">Opus 5.5 ▾</span><span class="pulse">Bypass permissions ▾</span><span>➤</span></div></div></div>
+  </div>
+
+  <div class="a"><h3>A7 · Start <span class="time">10 sec</span></h3>
+    <ol><li>Plug in your computer and keep the lid open.</li>
+    <li><b>Drag the setup file into the message box</b>, type <b>Set me up.</b> and press <b>Enter</b>.</li></ol>
+    <p class="note">From here your Claude leads. When it asks you to paste a key: copy it on the web page, click inside the <b>Terminal</b> tab Claude opened above the chat, press <b>Cmd+V</b> (Windows: Ctrl+V), then <b>Enter</b>. Nothing shows while you paste. That's normal.</p>
+  </div>
+</section>
+
 <!-- STEP 0 -->
 <section class="step" id="card0">
-  <div class="top"><div class="num">0</div><h2>Ready check</h2><div class="time">2 min</div></div>
+  <div class="top"><div class="num">0</div><h2>Ready check</h2><div class="time">3-10 min</div></div>
   <div class="who">
-    <div class="you"><b>You</b> · Open the Claude app → <b>Code</b>, drag in the setup file, and type <b>Set me up</b>.</div>
-    <div class="cl"><b>Claude</b> · Checks it can drive your Chrome. If not, it shows you the one button that adds it.</div>
+    <div class="you"><b>You</b> · If a Mac popup asks to install developer tools, click <b>Install</b>. Sign up or log in to GitHub, and type the 8-letter code Claude shows you.</div>
+    <div class="cl"><b>Claude</b> · Checks the model, the mode and your Chrome, installs the free tools it needs, and connects to GitHub.</div>
   </div>
   <div class="screen"><div class="cap">What you'll see</div>
-    <div class="ghbar"><span class="repo">Claude in Chrome</span><span class="btn gh pulse">Add to Chrome</span><span class="arrow">← click this once</span></div>
+    <div class="ghbar"><span class="repo">github.com/login/device</span><span class="btn ghost">XXXX-XXXX</span><span class="btn gh pulse">Continue</span><span class="arrow">→ Authorize</span></div>
   </div>
   <p class="note">Have ready: your KT affiliate link, and the logins for your Instagram, Facebook, YouTube and TikTok.</p>
 </section>
@@ -151,7 +215,7 @@ h2{font-size:26px;margin:0 0 6px}
 
 <!-- STEP 3 -->
 <section class="step" id="card3">
-  <div class="top"><div class="num">3</div><h2>Your style: just pick</h2><div class="time">5 min</div></div>
+  <div class="top"><div class="num">3</div><h2>Your style, your way</h2><div class="time">5-10 min</div></div>
   <div class="who">
     <div class="you"><b>You</b> · Your clips start plain. Tell Claude, or show it a screenshot or a reel, how you want them to look. Then answer 4 quick questions: voice, topics, comment word, your name.</div>
     <div class="cl"><b>Claude</b> · Turns your picks into your style, so every clip is made that way from now on.</div>
@@ -166,7 +230,7 @@ h2{font-size:26px;margin:0 0 6px}
 <section class="step" id="card4">
   <div class="top"><div class="num">4</div><h2>Connect your accounts</h2><div class="time">15 min</div></div>
   <div class="who">
-    <div class="you"><b>You</b> · Log in and click <b>Allow</b> for Meta (Instagram + Facebook) and Google (YouTube).</div>
+    <div class="you"><b>You</b> · Log in and click <b>Allow</b> for Meta (Instagram + Facebook), Google (YouTube) and TikTok. Three times Claude asks you to <b>paste a key</b>: copy it on the page, click inside the <b>Terminal</b> tab, <b>Cmd+V</b>, <b>Enter</b>.</div>
     <div class="cl"><b>Claude</b> · Builds every connection in your Chrome and switches autopost on.</div>
   </div>
   <div class="screen"><div class="cap">What you'll see</div>
@@ -204,7 +268,7 @@ h2{font-size:26px;margin:0 0 6px}
   <div class="top"><div class="num">6</div><h2>Switch it on</h2><div class="time">2 min</div></div>
   <div class="who">
     <div class="you"><b>You</b> · Nothing.</div>
-    <div class="cl"><b>Claude</b> · Starts your first batch, and sets the weekly "plan" routine that chooses your clips forever.</div>
+    <div class="cl"><b>Claude</b> · Starts your first batch and the posting heartbeat, and sets a weekly Monday task in your Claude app that chooses your clips forever (it runs while your computer is on).</div>
   </div>
   <div class="screen"><div class="cap">What you'll see</div>
     <div class="ghbar"><span class="btn ghost">Actions</span><span class="arrow">→</span><span class="btn ghost">factory</span><span class="arrow">→</span><span class="btn gh pulse">Run workflow</span></div>
