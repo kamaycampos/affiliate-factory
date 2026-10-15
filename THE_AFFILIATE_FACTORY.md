@@ -130,7 +130,8 @@ Then `[You]` set the repository **variable** `AUTOPOST` = `on`, and the secret `
 - **Prove it:** ask them to comment the keyword from another account (a friend or a second profile) on any post, and watch the DM arrive together. If it doesn't arrive in 2 minutes, say exactly why. Don't leave it.
 
 ### Step 6: Switch it on, and the weekly brain (2 min) · *Card 6*
-- `[You]` Start their first factory run: `gh workflow run factory.yml`. It stocks and transcribes their first episodes (1–3 hours). When it is done, run `plan` once yourself (a new factory has an empty month list; `CLAUDE.md` → `plan` explains it), so the first clips are built the same day.
+- `[You]` Start the heartbeat that makes posting really happen every 20 minutes: `gh workflow run pulse.yml` (GitHub's own timer alone runs it only every few hours).
+- `[You]` Start their first factory run: `gh workflow run factory.yml`. It stocks and transcribes their first episodes (1–3 hours). When it is done, run `plan` once yourself (a new factory has an empty month list; `CLAUDE.md` → `plan` explains it). **Pick episodes that match their lane**: the stocker starts with Kevin's newest uploads, which are mostly money and mindset. For another lane (health, real estate…), search `factory/rumble_catalog.json` by title and append 1080p+ episodes of that lane to `factory/source_plan.json`, then run the factory again, so the first clips are built the same day.
 - `[You]` Create a **weekly scheduled routine** on their Claude account (Monday morning, their time) on this repository, with the prompt `plan, then report`. If routines aren't available on their plan, tell them the one sentence that replaces it: say **plan** once a week.
 
 ### Step 7: The finish line (1 min) · *Card 7*
