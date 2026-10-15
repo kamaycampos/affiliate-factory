@@ -28,7 +28,7 @@ After setup, the member never has to do anything for the machine to keep working
 - **New Kevin episodes are found and cut automatically.** His newest upload is cut first, the same day it appears.
 - **Every week the best moments are chosen** (a scheduled Claude routine) in the member's voice, opening on the strongest line. The first 3 seconds decide everything.
 - **Clips are made in full HD**, with a six-word hook and word-perfect captions timed to Kevin's voice. Every clip passes quality gates before it can be posted.
-- **Clips post themselves** to Instagram, Facebook and YouTube, spaced like a human would post them. TikTok clips arrive in drafts, ready to post with one tap.
+- **Clips post themselves** to Instagram, Facebook and YouTube, spaced like a human would post them. TikTok clips land in their TikTok app inbox; they paste the caption from their Captions board and tap Post.
 - **Every comment with their keyword gets their link by DM**, automatically, once per person.
 - **Their numbers are measured** (views, comments, DMs, clicks), and what works feeds the next week's choices.
 - **They watch it all from one page**, their control panel, and they never need to open GitHub.
