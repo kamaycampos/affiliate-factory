@@ -202,7 +202,9 @@ def board(cs):
            "button.pick{background:#242a36;color:#e8e8ea;margin:2px 6px 12px 0;"
            "font-weight:600}button.pick.on{background:#f5c542;color:#111}"
            "details{margin:2px 0 0}summary{color:#8b93a5;font-size:12px;cursor:pointer}"
-           "#more{display:none}")
+           "#more{display:none}"
+           "a.dl{display:inline-block;margin-top:10px;padding:9px 14px;border-radius:8px;"
+           "background:#242a36;color:#e8e8ea;font-weight:700;text-decoration:none}")
 
     tb = thumbs()
     # A picture on every one of a hundred cards is a 300KB page on a phone for
@@ -218,6 +220,9 @@ def board(cs):
         tag = "READY TO POST" if is_ready else (
             "posted" if c.get("posted_at") else "scheduled")
         cid = "t" + str(abs(hash(f)))
+        # The clip's own file, to save and post by hand (Facebook while it is manual).
+        dl = (f"https://github.com/{os.environ.get('GITHUB_REPOSITORY', '')}/releases/download/media/"
+              + f.replace("/", "--"))
         # The picture is the point: he is holding a phone with a clip in the
         # TikTok inbox and needs to know THIS caption belongs to THAT video.
         img = tb.get(f) if is_ready or f in recent else None
@@ -236,7 +241,8 @@ def board(cs):
                 # card vanished anyway, so he lost the description and got an
                 # empty paste. Never hide what a copy button copies.
                 + f"<pre id='{cid}'>{html.escape(c.get('caption') or '')}</pre>"
-                + f"<button onclick=\"cp('{cid}',this)\">Copy</button></div>")
+                + f"<button onclick=\"cp('{cid}',this)\">Copy</button>"
+                + f" <a class=dl href='{dl}' download>&#11015; Video</a></div>")
 
     p = ["<meta charset=utf-8><meta name=viewport "
          "content='width=device-width,initial-scale=1'><title>Captions</title>",
