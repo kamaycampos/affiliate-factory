@@ -3,6 +3,7 @@
 
 ## PART A: FOR YOU, THE MEMBER (about 15 minutes, once)
 **You do Part A yourself. From step A8 on, your Claude does almost everything and talks you through the rest.**
+**Got this file on your phone?** Open the same chat (Telegram, WhatsApp or email) on your **computer** and save the file there. Everything happens on the computer.
 See every step with pictures: **kamaycampos.github.io/affiliate-factory/start/** (open it on your phone and keep it next to you).
 
 **What it costs:** Claude Pro, **$20 a month**. Nothing else, ever. Every other tool used here is free.
