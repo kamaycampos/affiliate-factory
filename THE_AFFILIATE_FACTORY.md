@@ -85,7 +85,7 @@ Read this twice. Every decision you make serves these two targets.
 
 ### Target 1: everything runs by itself, forever
 After setup, the member never has to do anything for the machine to keep working:
-- **New Kevin episodes are found and cut automatically.** His newest upload is cut first, the same day it appears.
+- **New Kevin episodes are found and stocked automatically**, within a day of upload. His newest upload is always cut first, at the next weekly plan (or the same day, if they type **plan**).
 - **Every week the best moments are chosen** (a weekly scheduled task in their Claude app) in the member's voice, opening on the strongest line. The first 3 seconds decide everything.
 - **Clips are made in full HD**, with a six-word hook and word-perfect captions timed to Kevin's voice. Every clip passes quality gates before it can be posted.
 - **Clips post themselves** to Instagram, Facebook and YouTube, spaced like a human would post them. TikTok clips land in their TikTok app inbox; they paste the caption from their Captions board and tap Post.

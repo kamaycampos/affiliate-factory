@@ -36,6 +36,16 @@ long_user = get("oauth/access_token", grant_type="fb_exchange_token", client_id=
                 client_secret=SECRET, fb_exchange_token=USER)["access_token"]
 pages = get("me/accounts", fields="name,id,access_token,instagram_business_account{username}",
             access_token=long_user).get("data", [])
+if not pages:
+    # A Page held through a business portfolio can be missing from me/accounts (Meta lists
+    # only Pages the person holds directly). The portfolio still lists it.
+    try:
+        for b in get("me/businesses", fields="id", access_token=long_user).get("data", []):
+            pages += get(f"{b['id']}/owned_pages", fields="name,id,access_token,instagram_business_account{username}",
+                         access_token=long_user).get("data", [])
+        pages = [p for p in pages if p.get("access_token")]
+    except SystemExit:
+        pass
 pages = [p for p in pages if p.get("instagram_business_account")] or pages
 if not pages:
     sys.exit("  No Facebook Page came with this token. Generate it again and tick your Page.")
