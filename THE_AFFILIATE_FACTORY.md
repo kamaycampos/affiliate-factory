@@ -31,8 +31,8 @@ A1. GET CLAUDE PRO (3 minutes)
 
 Do you already have Claude Pro?
 Open claude.ai on your computer and log in. Look at the bottom left corner. Right next to your name, in small letters, it shows your plan.
-- It says "Pro plan" or "Max plan": you already have it. Go straight to A2.
-- It says "Free plan": do only step 3 below.
+- It says "Pro" or "Max": you already have it. Go straight to A2.
+- It says "Free": do only step 3 below.
 - You have no Claude account yet: do steps 1, 2 and 3 below.
 
 1. On your computer, open claude.ai
