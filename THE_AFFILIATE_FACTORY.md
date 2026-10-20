@@ -1,78 +1,125 @@
-# THE AFFILIATE FACTORY
-### Give this one file to your Claude. That's the whole instruction.
+WELCOME TO THE AFFILIATE FACTORY
 
-## PART A: FOR YOU, THE MEMBER (about 15 minutes, once)
-**You do Part A yourself. From step A8 on, your Claude does almost everything and talks you through the rest.**
-**Got this file on your phone?** Open the same chat (Telegram, WhatsApp or email) on your **computer** and save the file there. Everything happens on the computer.
-See every step with pictures: **kamaycampos.github.io/affiliate-factory/start/** (open it on your phone and keep it next to you).
+Follow steps A1 to A7 yourself. They take about 15 minutes, once.
+In step A8 you hand this file to Claude, and Claude takes over from there.
 
-**What it costs:** Claude Pro, **$20 a month**. Nothing else, ever. Every other tool used here is free.
 
-**Have these ready before you start** (write them on paper if that helps):
-- Your **Kevin Trudeau affiliate link** (from the affiliate portal)
-- The **email and password** for your **Instagram**, **Facebook**, **YouTube** (your Google account) and **TikTok**
-- Your **phone**, close by: some sites text you a code
-- About **45 minutes** when nobody needs your computer
+BEFORE WE START: 3 QUESTIONS
 
-### A1. Get Claude Pro (3 min)
-1. On your computer, open **claude.ai**.
-2. Click **Sign up**. Use **Continue with Google** or your email, and follow the steps.
-3. Click your name or initials (bottom left) → **Upgrade plan** (or **Settings → Billing**) → choose **Pro, $20/month** → pay with your card.
-   *You type your own card details. Your Claude never asks for them.*
+1. What if I opened this file on my phone?
+   Answer: Don't do this on your phone. Everything happens on the computer.
+   Open the same chat or email where you got this file (Telegram, WhatsApp or email) on your computer, and save the file there.
 
-### A2. Install the Claude app (3 min)
-1. Open **claude.ai/download** and click the button for your computer (**Mac** or **Windows**).
-2. **Mac:** open the downloaded file, drag **Claude** into **Applications**, then open Claude from Applications. If the Mac asks "Are you sure you want to open it?", click **Open**.
-   **Windows:** open the downloaded file and follow the installer.
-3. Sign in with the **same account** you paid for in A1.
+2. How much will this cost?
+   Answer: Claude Pro, $20 a month. Nothing else. Every other tool used here is free.
 
-### A3. Install Google Chrome and the Claude extension (3 min)
-1. No Google Chrome yet? Install it from **google.com/chrome**. Your Claude works in Chrome, where your accounts are already logged in.
-2. In Chrome, open: **chromewebstore.google.com/detail/claude/fcoeoabgfenejglbffodgkkbkcdhcgfn**
-3. Click **Add to Chrome**, then **Add extension**.
-4. Click the **puzzle piece** (top right of Chrome) → click the **pin** next to **Claude**, so its icon stays visible.
-5. Click the **Claude icon** → **sign in** with the **same Claude account** as A1.
+3. What if I learn better with pictures?
+   Answer: See every step with pictures on this page. Open it on your phone and keep it next to you:
 
-### A4. Let your Claude work without stopping to ask (1 min)
-1. In the Claude app, click your name or initials (bottom left) → **Settings** → **Claude Code**.
-2. Turn **ON**: **Allow bypass permissions mode**.
-   *This lets your Claude do the setup without asking "may I?" a hundred times. After setup, you can switch the mode back to **Auto** (step A6).*
+   https://kamaycampos.github.io/affiliate-factory/start/
 
-### A5. Make a folder for your factory (1 min)
-1. On your Desktop: right-click → **New Folder** (Mac) or **New → Folder** (Windows). Name it **My Factory**.
-2. Drag **this file** into that folder.
 
-### A6. Open Claude Code, the right way (2 min)
-1. In the Claude app, click the **Code** tab at the top (the tabs are **Chat · Cowork · Code**). *It must be **Code**, not Chat.*
-2. Below the message box, set these:
-   - **Project folder** → choose the **My Factory** folder from A5
-   - **Environment** → **Local**
-   - **Model** (the menu next to the send button) → **Opus 5.5**
-   - **Mode** (the other menu next to the send button) → **Bypass permissions**
+WHAT YOU NEED BEFORE YOU START
+
+1. Your Kevin Trudeau affiliate link (from the affiliate portal).
+2. The email and password for your Instagram, Facebook, YouTube (your Google account) and TikTok.
+3. Your phone, close by. Some sites text you a code.
+4. About 45 minutes in total (15 minutes for steps A1 to A8, then about 30 minutes with Claude), at a time when nobody needs your computer.
+
+
+A1. GET CLAUDE PRO (3 minutes)
+
+Do you already have Claude Pro?
+Open claude.ai on your computer and log in. Look at the bottom left corner, under your name.
+- It says "Pro plan" or "Max plan": you already have it. Go straight to A2.
+- It says "Free plan": do only step 3 below.
+- You have no Claude account yet: do steps 1, 2 and 3 below.
+
+1. On your computer, open claude.ai
+2. Click "Sign up". Use "Continue with Google" or your email, and follow the steps.
+3. Click your name (bottom left), then "Upgrade plan". Choose Pro, $20 a month, and pay with your card.
+   You type your own card details. Claude never asks for them.
+
+Use this same Claude account in every step that follows.
+
+
+A2. INSTALL THE CLAUDE APP (3 minutes)
+
+1. Open claude.ai/download and click the button for your computer (Mac or Windows).
+2. Mac: open the downloaded file, drag Claude into Applications, then open Claude from Applications. If the Mac asks "Are you sure you want to open it?", click Open.
+   Windows: open the downloaded file and follow the installer.
+3. Sign in with the same account as in A1.
+
+
+A3. INSTALL GOOGLE CHROME AND THE CLAUDE EXTENSION (3 minutes)
+
+1. No Google Chrome yet? Install it from google.com/chrome. Your Claude works in Chrome, where your accounts are already logged in.
+2. In Chrome, open this address:
+
+   https://chromewebstore.google.com/detail/claude/fcoeoabgfenejglbffodgkkbkcdhcgfn
+
+3. Click "Add to Chrome", then "Add extension".
+4. Click the puzzle piece (top right of Chrome), then click the pin next to Claude, so its icon stays visible.
+5. Click the Claude icon and sign in with the same Claude account as in A1.
+
+
+A4. LET YOUR CLAUDE WORK WITHOUT STOPPING TO ASK (1 minute)
+
+1. In the Claude app, click your name (bottom left), then Settings, then Claude Code.
+2. Turn ON: "Allow bypass permissions mode".
+   This lets your Claude do the setup without asking "may I?" a hundred times. After setup, you can switch the mode back to Auto (see A6).
+
+
+A5. MAKE A FOLDER FOR YOUR FACTORY (1 minute)
+
+1. On your Desktop, right-click. Mac: choose "New Folder". Windows: choose "New", then "Folder". Name it My Factory.
+2. Drag this file into that folder.
+
+
+A6. OPEN CLAUDE CODE, THE RIGHT WAY (2 minutes)
+
+1. In the Claude app, click the Code tab at the top (the tabs are Chat, Cowork, Code). It must be Code, not Chat.
+2. Below the message box, set these four things:
+   Project folder: choose the My Factory folder from A5
+   Environment: Local
+   Model (the menu next to the send button): Opus 5.5
+   Mode (the other menu next to the send button): Bypass permissions
 3. Leave everything else as it is.
 
-### A7. Keep your computer awake (10 sec)
+
+A7. KEEP YOUR COMPUTER AWAKE (10 seconds)
+
 Plug the computer in, and don't close the lid during setup. Some steps run for a few minutes.
 
-### A8. Start (10 sec)
-**Drag this file into the message box**, type **Set me up.** and press **Enter**.
 
-**From here on your Claude leads.** For about 30 minutes, you only do four kinds of things:
-1. **Log in** where Claude asks (you type your own passwords; Claude never sees them)
-2. Click **Allow / Continue / Agree** when Claude tells you to
-3. **Choose**: how your clips look and sound, and what they're about
-4. **Paste** a key when Claude asks: copy it from the web page, click inside the **Terminal** tab Claude opened (above the chat), press **Cmd+V** (Windows: **Ctrl+V**), then **Enter**. Nothing shows while you paste; that's normal.
+A8. START (10 seconds)
 
-### If something gets in the way
-- **"Usage limit reached":** Pro has a usage limit that resets every few hours. Wait until the time Claude shows, then type **continue**. Everything done so far is saved. In a hurry? Switch **Model** to **Sonnet 5.5** and type **continue**.
-- **A web page stops reacting:** bring the Chrome window Claude is working in to the **front** and leave it there. Hidden windows freeze.
-- **Claude can't reach Chrome:** click the **Claude icon** in Chrome. If it says **Connect**, click it. Make sure it's signed in to the same Claude account.
-- **A site asks for a code:** type it yourself from your phone or email. Never read it out to Claude.
-- **Lost or unsure?** Type what you see in plain words, e.g. *"I see a blue button that says Continue"*. Claude will tell you exactly what to click.
+Drag this file into the message box, type: Set me up.
+Then press Enter.
 
----
+From here on, Claude leads. For about 30 minutes you only do four kinds of things:
+1. Log in where Claude asks. You type your own passwords; Claude never sees them.
+2. Click Allow, Continue or Agree when Claude tells you to.
+3. Choose how your clips look and sound, and what they are about.
+4. Paste a key when Claude asks: copy it from the web page, click inside the Terminal tab Claude opened (above the chat), press Cmd+V (Windows: Ctrl+V), then Enter. Nothing shows while you paste. That is normal.
+
+
+IF SOMETHING GETS IN THE WAY
+
+- "Usage limit reached": Claude Pro has a usage limit that resets every few hours. Wait until the time Claude shows, then type: continue. Everything done so far is saved. In a hurry? Switch the Model menu to Sonnet 5.5 and type: continue
+- A web page stops reacting: bring the Chrome window Claude is working in to the front and leave it there. Hidden windows freeze.
+- Claude can't reach Chrome: click the Claude icon in Chrome. If it says Connect, click it. Make sure it is signed in to the same Claude account.
+- A site asks for a code: type it yourself from your phone or email. Never read it out to Claude.
+- Lost or unsure? Type what you see in plain words, for example: I see a blue button that says Continue. Claude will tell you exactly what to click.
+
+
+==================================================================
+THIS IS THE END OF YOUR PART. YOU CAN STOP READING HERE.
+Everything below is written for Claude, not for you. Claude reads it when you drag this file in at step A8.
+==================================================================
 
 ## FOR CLAUDE: read all of this before your first message to the member
+(Part A above is written as plain text on purpose: members open this file in plain-text viewers and it may be machine-translated. Keep it free of markdown marks.)
 
 You are setting up **The Affiliate Factory** for a Kevin Trudeau affiliate. Assume they are **not technical, possibly older, and easily overwhelmed**. They will judge the whole product by how these 30 minutes *feel*. If they feel lost even once, the product failed. Your tone: warm, calm and brief, one thing at a time.
 
@@ -117,7 +164,7 @@ Check each one yourself before you say "done". Don't take a tool's word for it: 
 ---
 
 ## 2. HOW YOU WORK WITH THEM (non-negotiable)
-1. **Show, don't tell.** Before every step, open the visual guide card for that step: **kamaycampos.github.io/affiliate-factory/start/**. Or take a screenshot of the exact screen and say where to click ("the green button, top right"). Never send them to read a document.
+1. **Show, don't tell.** Before every step, open the visual guide card for that step: https://kamaycampos.github.io/affiliate-factory/start/ . Or take a screenshot of the exact screen and say where to click ("the green button, top right"). Never send them to read a document.
 2. **One step per message.** Say what's about to happen in one sentence, do it, and confirm it worked in one sentence. Show a progress bar like `Step 3 of 7 ▓▓▓░░░░`.
 3. **They only do four kinds of things:** log in (they type their own passwords; **you never type a password, code or card number**), click **Allow / Continue / Agree**, choose, and paste a key into a Terminal tab you opened. Everything else is yours. Every time they act, say **which window, which tab, which button, where on the screen** ("Chrome, the tab called *TikTok for Developers*, the small ⌄ arrow to the right of *Client secret*"). Never say "paste the script" or "run the box": say "click inside the Terminal tab called *X* above the chat, press Cmd+V, then Enter".
 4. **You drive their Chrome** with Claude in Chrome (never the app's built-in Browser pane: it has none of their logins). Ask once at the start: *"May I use your Chrome to set everything up? You'll approve each log-in."* It's the difference between 30 minutes and 3 hours. If they have two Chrome windows or profiles, pick the one logged in to the account each step needs, and tell them which one you are in.
