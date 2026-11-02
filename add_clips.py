@@ -43,13 +43,26 @@ REPO = "YOUR-GITHUB-NAME/YOUR-REPO"
 TAG = "media"
 
 
+def true_caption(cap, brand):
+    """WB (my_brand/offers.json): the caption Kamay copies into TikTok carries only the one
+    true offer line, never a planner-written promise (1 Nov 2026, engine/poster.brand_offers).
+    Any other brand: unchanged."""
+    if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), "my_brand", "offers.json")):
+        return cap
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "engine"))
+    import poster
+    off = poster.brand_offers(brand) or {}
+    return poster.caption_for("tiktok", cap, brand, off.get("keyword", ""), "", 0)
+
+
 def captions():
     """slug -> (caption, brand), from kt_series.json."""
     out = {}
     for spec in json.load(open(SERIES)).values():
         for c in spec.get("clips", []):
             if c.get("caption"):
-                out[(spec["brand"], c["slug"])] = c["caption"]
+                out[(spec["brand"], c["slug"])] = true_caption(c["caption"], spec["brand"])
     return out
 
 

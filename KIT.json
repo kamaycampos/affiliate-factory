@@ -1,15 +1,16 @@
 {
- "version": "1.2.0",
+ "version": "1.3.0",
  "upstream": "kamaycampos/affiliate-factory",
  "changes": [
-  "ONE setup file: THE_AFFILIATE_FACTORY.md - give it to your Claude, 30 minutes, you only log in, click Allow and choose",
-  "Visual guide: one picture per step, and your style picked from 6 real looks",
-  "Free: the only cost is Claude Pro. Instagram, Facebook and YouTube post by themselves; TikTok drafts are one tap",
-  "Kevin's newest episode is cut first, the same day it appears",
-  "Comment -> DM never sends twice when Meta's own rule already answered",
-  "Captions: one question per post, the comment word matches the clip, flagged words softened",
-  "Newest caption engine: timing anchored to the voice, fewer good clips thrown away as 'scrambled'",
-  "Top resolution: an episode below Rumble's best is fetched again",
-  "No more daily 'Run failed' emails when TikTok is not connected"
+  "Trial Reels: one clip a day gets 7 hooks, posted to Instagram as Trial Reels (non-followers only); the winner is measured after 48 h",
+  "The cinema look: film grade, a quiet serif label, calm captions - say 'cinema' when you set your style",
+  "Cadence: every 2 hours the machine checks today has enough posts and builds the waiting plans if not",
+  "Second pass: an episode already cut once is mined again for its unused minutes, never re-using a cut",
+  "Never two posts of the same video on one day; a day never holds more posts than its slots",
+  "Captions never promise what the DM does not send (my_brand/offers.json holds the one true offer)",
+  "Optional lane (my_brand/lane.json): off-topic hooks, harsh words and platform-risk words refused before building",
+  "Saves cannot be lost: a factory run that fails to push its clips now fails out loud instead of showing success",
+  "Faster, safer builds: trial hooks render on their own servers; the board's 'copied' ticks survive rebuilds",
+  "Newest caption engine and edge checks (shared with the live accounts, 2 Nov)"
  ]
 }

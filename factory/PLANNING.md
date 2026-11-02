@@ -26,11 +26,33 @@ cut off still keeps the plans it finished.
      - "captions vs the sound", "UNCAPTIONED SPEECH", "too few to judge" -> move both edges to different sentence boundaries (a few seconds re-times every caption). If the gap named is someone else talking, cut so it falls outside.
    - `tries 2` means this is its last chance: skip it unless you can see the cause and fix it.
    - Second chances never count toward the number of new episodes. Skip any with `tries 2` unless the cause is obvious. Report how many you re-cut and how many you skipped, and why.
+2d. If the prep printed **SECOND PASS**, those episodes were already cut once, and most of their minutes were never used (16 Oct 2026: KT's planned episodes are 1,295 minutes, their plans touch 302). Plan them after any new episode and after second chances, the same way, with these differences:
+   - Write `factory/plans/ep_<id>_p2.json` (`_p3` if `_p2` exists), with the same `source` and a **new** brand (`KT_` + one word, unused by any plan).
+   - In `work/<id>_blocks.txt` every stretch a clip already uses is one line, `=== USED by <SLUG> (in-out s) ===`. Never cut inside it: `check_plan.py` refuses a clip that re-uses more than 10 seconds of another clip's minutes.
+   - New teachings only: read the USED slugs, and skip a moment that repeats the lesson of a clip already cut, even from different minutes.
+   - The same bar as a first pass: value first, the sharpest opening line, one arc = one clip. If the unused minutes hold only 2 clips worth posting, plan 2. Fewer good clips beat more weak ones.
 3. Read `factory/MASTERY.md` (what is proven to work, with its confidence) and `factory/HOOK_PATTERNS.md`, then read each episode's `work/<id>_blocks.txt` in full. Choose 6-9 clips per episode.
 4. Write `factory/plans/ep_<id>.json` (format below). Get exact start and end times from the cues in `work/<id>.srt`.
 5. `python factory/check_plan.py factory/plans/ep_<id>.json` for every plan. Fix everything it reports.
 6. Commit only the new plan files (plus `source_plan.json` if you extended it; only ever append to it) with the message `weekly plans: <episode titles>`, and push them to a new branch named `claude/plans-<YYYY-MM-DD>`. A GitHub job checks them again, merges only the plan files into main and starts the factory, which builds, checks and queues the clips. Never push to main, and never edit anything outside `factory/plans/` and `factory/source_plan.json`.
 7. End with a short report: the episodes planned, the clip titles, and anything you skipped and why. If something you saw contradicts `factory/MASTERY.md`, say so in the report - do not edit that file.
+
+## The offer line is the machine's, not yours (1 Nov 2026)
+If `my_brand/offers.json` exists, never write the offer or the comment line yourself. Captions end on the
+teaching or a question; the machine adds the one true offer line from that file. Never promise something the
+DM does not send ("the cheat sheet", "my list", "I'll tell you"): the machine deletes such a sentence. On the
+live account, captions had promised 9 different freebies while the comment only ever sent one link.
+
+## Trial hooks: 7 hooks, 1 clip, every day (1 Nov 2026)
+In the MORNING run (before 15:00 UTC) only, pick the ONE strongest clip you plan (the newest episode's best
+when there is one) and add `"trial_hooks"`: exactly 7 alternatives to its hook, each `["line one", "line two"]`,
+six words in all, each a DIFFERENT lever and all true to the clip: (1) the biggest number or sum, (2) a villain
+named, (3) a surprising true fact, (4) what the viewer is missing, (5) a named person + outcome, (6) Kevin
+Trudeau by name, (7) your wildest true one. The factory renders all 7 on their own servers (only the hook
+changes) and posts them as Instagram Trial Reels (shown to non-followers only) once the clip itself has posted;
+48 h later `state/variants.json` holds each one's views and the winner. Read the last winners there before you
+write any hook. `check_plan.py` lints every trial hook like a normal hook. Instagram only; skip it when
+Instagram is not connected.
 
 ## What makes a clip worth posting (Kamay's taste, learned from real numbers)
 - **Value is the foundation.** Every clip must teach, reveal or move. Controversy, intrigue and a sharp hook multiply value; they never replace it.

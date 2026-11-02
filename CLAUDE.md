@@ -83,6 +83,7 @@ Their clips' look lives in `my_brand/style.json`. It covers:
 - `accent_captions`
 - `hook_card_color`, `hook_bar_color`, `hook_text_color`: the hook card's panel, underline bar and text (hex, e.g. `#0F3B27`)
 - `font_file`: a .ttf they add under `my_brand/fonts/`. Use a static heavy weight; a variable font renders thin.
+- `look`: `"cinema"` = the picture graded like film, the hook a quiet serif label with no box (it moves under the chin when it would cross the face), captions small and calm in sentence case low in the frame. Anything else is the plain look. Offer it only when what they describe is calm, premium or documentary.
 
 Turn what they describe ("calmer", "cyan like my brand", "no capitals") into values, show the change in one line, commit and push. Every clip built after that uses it. Remind them that the panel's Style room previews it.
 

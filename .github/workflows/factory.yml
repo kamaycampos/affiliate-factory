@@ -25,6 +25,9 @@ env:
   KT_LOCK_REPO: ${{ github.repository }}       # this copy's own posting record
   FACTORY_KEY: ${{ secrets.FACTORY_KEY }}
   TRANSCRIPT_KEY: ${{ secrets.TRANSCRIPT_KEY }}
+  PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}          # cinematic openers (kt_opener.py)
+  OPENER_LIVE: ${{ vars.OPENER_LIVE }}             # "on" after Kamay approves the first automatic one
+  KT_LOOK: ${{ vars.KT_LOOK }}                     # 'cinema' = Kamay's look B (1 Nov 2026)
   GH_TOKEN: ${{ github.token }}
 jobs:
   stock:
@@ -128,7 +131,11 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
+      # MAIN AS IT IS NOW, not the commit that started the run (14 Oct 2026, KT). A run
+      # that waited behind another factory run otherwise merged its clips into the
+      # kt_series.json of hours before; queue.py no longer pulls, so this must.
       - uses: actions/checkout@v4
+        with: { ref: main }
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
       - uses: actions/cache@v4
@@ -143,6 +150,11 @@ jobs:
           python factory/queue.py /tmp/shards
       - name: Save
         run: |
+          # Never commit a JSON file that does not parse: one broken kt_series.json
+          # (conflict markers, 14 Oct 2026) stopped every factory run for both accounts.
+          for f in $(git ls-files -m -o --exclude-standard state docs factory | grep '\.json$'); do
+            python -c "import json,sys; json.load(open(sys.argv[1]))" "$f" || { echo "REFUSED: $f is not valid JSON"; exit 1; }
+          done
           git add -A state docs factory
           git diff --staged --quiet || git commit -q -m "factory: clips built and queued $(date -u +%FT%TZ)"
-          for i in 1 2 3; do git pull -q --rebase --autostash && git push -q && break; sleep 5; done
+          bash factory/save_state.sh

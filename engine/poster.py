@@ -355,6 +355,35 @@ ASK_LINES = [
 DEFAULT_OFFER = "https://your-affiliate-link"
 
 
+# THE ONLY TRUE OFFER (1 Nov 2026). Kamay: "you made up those offers, in every other clip you
+# are offering different stuff that we do not have." The planner wrote its own promise into
+# 9 posted WB captions ("the label cheat sheet", "our filter setup", "the oils we keep in our
+# kitchen") while commenting HEALTH only ever gets the World's Best Daily link. A brand with
+# my_brand/offers.json now never carries a planner-written ask: every sentence asking for a
+# comment or promising to send something is removed, wherever it sits, and one of the
+# brand's fixed, checked lines takes its place.
+_OFFERS_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "my_brand", "offers.json")
+_PROMISE = re.compile(r"\bcomment\s+[\"'\u201c]?[A-Z]{2,}\b|\b(?:we|i)(?:'|\u2019)?ll\s+(?:send|dm|tell|show|give)\b"
+                      r"|\bsend you\b|\bdm you\b", re.I)
+
+
+def brand_offers(brand=""):
+    if cred_prefix(brand) == "AR" or not os.path.exists(_OFFERS_PATH):
+        return None
+    try:
+        return json.load(open(_OFFERS_PATH))
+    except (OSError, ValueError):
+        return None
+
+
+def strip_promises(line):
+    """The line without any sentence that asks for a comment or promises to send something."""
+    if not _PROMISE.search(line):
+        return line
+    parts = re.split(r"(?<=[.!?])\s+", line)
+    return " ".join(x for x in parts if not _PROMISE.search(x)).strip()
+
+
 def caption_for(platform, caption, brand="", keyword="", ask="", variant=None):
     """The caption rewritten for ONE platform's link rules.
 
@@ -385,6 +414,10 @@ def caption_for(platform, caption, brand="", keyword="", ask="", variant=None):
             and not l.strip().lower().startswith("get access here:")]
     tags = [l for l in body if l.strip().startswith("#")]
     body = [l for l in body if not l.strip().startswith("#")]
+    offers = brand_offers(brand)
+    if offers:
+        body = [x for x in (strip_promises(l) if l.strip() else l for l in body) if x or not x.strip()]
+        body = [l for k, l in enumerate(body) if l.strip() or (k and body[k - 1].strip())]
     while body and not body[-1].strip():
         body.pop()
 
@@ -507,6 +540,13 @@ def caption_for(platform, caption, brand="", keyword="", ask="", variant=None):
     # added "What did you take from this one?" under it on every post - two questions
     # back to back, the second one identical across the whole account. When the body
     # already asks, the generic question goes and only the keyword line stays.
+    if offers and offers.get("keyword"):
+        kw = offers["keyword"]          # the brand's own word, whatever this job's env holds
+    if offers and kw and offers.get("cta_lines"):
+        v = variant if isinstance(variant, int) else 0
+        cta = offers["cta_lines"][v % len(offers["cta_lines"])].replace(offers.get("keyword", kw), kw)
+        if platform == "youtube" and url and offers.get("youtube_line"):
+            cta += "\n\n" + offers["youtube_line"].format(url=url)
     last = next((l for l in reversed(body) if l.strip()), "")
     mine_only = cred_prefix(brand) != "AR"          # Yaren's captions are hers to change
     if mine_only and last.rstrip().endswith("?") and cta:
@@ -693,6 +733,9 @@ def _ig_permalink(media_id, tok):
     return None
 
 
+LAST_MEDIA_ID = None
+
+
 def instagram(path, caption, public_url, clip=None, trial=False):
     """Publish a Reel. `trial=True` makes it a TRIAL REEL.
 
@@ -786,6 +829,8 @@ def instagram(path, caption, public_url, clip=None, trial=False):
     mid = d.get("id")
     if not mid:
         return f"publish failed {p.status_code}: {str(d)[:200]}"
+    global LAST_MEDIA_ID
+    LAST_MEDIA_ID = mid                    # trials.py scores each trial reel by its id
     link = _ig_permalink(mid, tok)
     if not link:
         # THE 24 AUG BUG, caught instead of reported as success.

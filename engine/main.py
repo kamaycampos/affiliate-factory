@@ -317,13 +317,29 @@ def plan(man):
         # Counts clips ALREADY scheduled too, so a re-plan cannot stack onto a
         # day that is already carrying that source.
         PER_SOURCE_PER_DAY = 2
+        DAY_FLOOR = int(os.environ.get("CADENCE_MIN") or 4)   # RULES #5 floor (KT 4, WB 3): the mix may bend below it
+        # THE SOURCE IS THE VIDEO, NOT THE FOLDER (29 Oct 2026). A re-cut (KT_X -> KT_XR2)
+        # and a second pass (a new folder name) are the same episode, same shirt, same
+        # room - counted by folder they could stack 4-6 posts of one video on one day.
+        # The plans say which video each folder came from.
+        _vid = {}
+        try:
+            _pd = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "factory", "plans")
+            for _f in os.listdir(_pd):
+                if _f.endswith(".json") and not _f.startswith("_"):
+                    _q = json.load(open(os.path.join(_pd, _f)))
+                    if _q.get("brand") and _q.get("source"):
+                        _vid[_q["brand"]] = _q["source"]
+        except (OSError, ValueError):
+            pass
+        src_of = lambda c: (_vid.get(brand_of(c)) if prefix != "AR" else None) or brand_of(c)   # Yaren's unchanged
         last_src = [None]          # source of the post placed immediately before
         used = {}
         for c in man["clips"]:
             sa = c.get("scheduled_at")
             if sa and not c.get("done") and not c.get("posted_at"):
                 d0 = used.setdefault(sa[:10], {})
-                d0[brand_of(c)] = d0.get(brand_of(c), 0) + 1
+                d0[src_of(c)] = d0.get(src_of(c), 0) + 1
 
         # ORDER, 5 Sept 2026. Kamay: "posting all clips from a same video all
         # together following on another its bored, it need to be separate kind
@@ -376,6 +392,19 @@ def plan(man):
             queue.append(folders[picked].pop(0))
             rnd += 1
 
+        # A DAY HOLDS AS MANY POSTS AS ITS GRID HAS SLOTS - POSTED ONES INCLUDED.
+        # 19 Oct 2026: Kamay had WB's one clip of the day posted at 07:40 instead of
+        # its 20:00 slot. "taken" above counts only clips still WAITING, so the
+        # evening slot would have looked free and a freshly built clip would have
+        # gone out the same day - two posts on an account in its 1-a-day warm-up.
+        per_day = {}
+        for c in man["clips"]:
+            if poster.account_key(brand_of(c)) != prefix:
+                continue
+            t = c.get("posted_at") or (None if c.get("done") else c.get("scheduled_at"))
+            if t:
+                per_day[t[:10]] = per_day.get(t[:10], 0) + 1
+
         day = now.date()
         for _ in range(HORIZON_DAYS):
             for hhmm in slots:
@@ -411,10 +440,12 @@ def plan(man):
                 # the day gets it anyway - a gap serves nobody - but that is now
                 # the exception it should always have been.
                 dkey = when.strftime("%Y-%m-%d")
+                if per_day.get(dkey, 0) >= len(slots):
+                    continue
                 spent = used.setdefault(dkey, {})
 
                 def ok(qi, strict):
-                    b = brand_of(man["clips"][qi])
+                    b = src_of(man["clips"][qi])
                     if spent.get(b, 0) >= PER_SOURCE_PER_DAY:
                         return False
                     # and not the same source as the post immediately before it
@@ -422,11 +453,20 @@ def plan(man):
 
                 pick = next((n for n, qi in enumerate(queue) if ok(qi, True)),
                             next((n for n, qi in enumerate(queue)
-                                  if ok(qi, False)), 0))
+                                  if ok(qi, False)), None))
+                # A THIRD CLIP OF ONE VIDEO ONLY TO REACH THE FLOOR (29 Oct 2026). With two videos
+                # in the queue the fallback gave 30 Oct four posts of Kevin's 28 Oct episode -
+                # the "bored" day RULES #21 forbids. Over the limit is allowed only while the day
+                # is under DAY_FLOOR posts; past it, the slot waits for another video.
+                if pick is None:
+                    if per_day.get(dkey, 0) >= DAY_FLOOR and prefix != "AR":   # Yaren's grid unchanged
+                        continue
+                    pick = 0
                 nxt = man["clips"][queue.pop(pick)]
-                spent[brand_of(nxt)] = spent.get(brand_of(nxt), 0) + 1
-                last_src[0] = brand_of(nxt)
+                spent[src_of(nxt)] = spent.get(src_of(nxt), 0) + 1
+                last_src[0] = src_of(nxt)
                 nxt["scheduled_at"] = key
+                per_day[dkey] = per_day.get(dkey, 0) + 1
                 # ROTATE THE COMMENT KEYWORD, IN POSTING ORDER. Daniel's point
                 # via Kamay: consecutive posts must ask for DIFFERENT words so
                 # each one feels like a new thing rather than the same ad. Doing

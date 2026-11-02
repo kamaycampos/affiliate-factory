@@ -9,6 +9,7 @@ blocks, and lists next candidate episodes if the month's list is running out.
 import json, os, re, subprocess, sys, urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
+LANE = os.path.exists(os.path.join(ROOT, "my_brand", "lane.json"))   # a brand with its own lane (WB)
 BASE = "https://github.com/YOUR-GITHUB-NAME/YOUR-REPO/releases/download/sources/"
 MAX = int(sys.argv[sys.argv.index("--max") + 1]) if "--max" in sys.argv else 4
 # WHOSE MACHINE IS THIS RUN FOR. Two accounts, two lists, two sets of plans, and
@@ -37,6 +38,46 @@ except Exception:
 
 idx = json.loads(get("sources_index.json"))
 
+# KEVIN'S WEDNESDAY EPISODE IS MINED, NOT SAMPLED (29 Oct 2026). Kamay: "the system have
+# not been picking as a priority and making clips from last kt videos, new releases every
+# Wednesday." It wasn't: 28 Oct's 17-minute 4K episode got a 2-clip plan, both refused,
+# 0 posted - and the next morning's run re-cut older episodes, because an episode stopped
+# counting as "newest" the moment ANY plan named it, and second chances went to the
+# episodes with the most refusals. Now, for KT: every Kevin upload from the last 8 days
+# with fewer than NEWEST_TARGET clips posted / waiting / still building stays at the top
+# of every run (morning and afternoon): its refusals are re-cut first, and its unused
+# minutes are offered for new arcs before anything else.
+NEWEST_DAYS, NEWEST_TARGET = 8, 6
+_pub = {}
+try:
+    for _u, _e in json.load(open(os.path.join(HERE, "rumble_catalog.json"))).items():
+        _m = re.search(r"/(v[a-z0-9]+)-", _u)
+        if _m and not _e.get("short"):
+            _pub[_m[1]] = _e.get("date", "")
+except (OSError, ValueError):
+    pass
+_allplans = {f[:-5]: json.load(open(os.path.join(HERE, "plans", f))) for f in os.listdir(os.path.join(HERE, "plans"))
+             if f.endswith(".json") and not f.startswith("_")}
+try:
+    _builtplans = set(json.load(open(os.path.join(HERE, "plans", "_done.json"))))
+except (OSError, ValueError):
+    _builtplans = set()
+def _alive(v):
+    """Clips of source v that are posted, waiting to post, or in a plan not built yet."""
+    keys = [k for k, q in _allplans.items() if k.startswith(MINE) and q.get("source", "")[:-4] == v]
+    brands = {_allplans[k].get("brand") for k in keys}
+    n = sum(1 for c in man if c["file"].split("/")[0] in brands
+            and (c.get("posted_at") or not c.get("done")))
+    return n + sum(len(_allplans[k].get("clips", [])) for k in keys if k not in _builtplans)
+_since = (__import__("datetime").datetime.utcnow() - __import__("datetime").timedelta(days=NEWEST_DAYS)).strftime("%Y-%m-%d")
+undercut = {}
+if not AR and not LANE:             # Kevin's money uploads are KT's lane, not a health brand's
+    for v in sorted((v for v, d in _pub.items() if d >= _since), key=lambda v: _pub[v], reverse=True):
+        if v in idx and idx[v].get("transcript") and f'"{v}.mp4"' in " ".join(json.dumps(q) for q in _allplans.values()):
+            n = _alive(v)
+            if n < NEWEST_TARGET:
+                undercut[v] = n
+
 # SECOND CHANCES (6 Oct 2026). Every clip a gate refused is in plans/_failed.json
 # with the gate's own words. Re-cut them FIRST: the episode is already transcribed
 # and the teaching was already judged worth posting. A clip is offered at most
@@ -48,6 +89,13 @@ MAX_TRIES = 3
 # KT, 29 clips for AR - fanned out 21 agents and hit the account's usage limit with
 # nothing pushed. The rest wait for the next daily run.
 AGAIN = int(sys.argv[sys.argv.index("--again") + 1]) if "--again" in sys.argv else 3
+SECOND_MIN_EP, SECOND_FREE = 30, 15     # second pass: episodes of 30+ min with 15+ unused min
+# A brand with its own lane (WB: health only) has few HD episodes, mostly 7-20 minute clips
+# shows; its second pass takes any 10+ minute episode with 4+ unused minutes (29 Oct 2026).
+if LANE:
+    SECOND_MIN_EP, SECOND_FREE = 10, 4
+second = {}                              # second-pass episode -> the clips already cut from it
+focus = {}                               # lane brand: episode -> its health-dense 30 s blocks
 try:
     _f = json.load(open(os.path.join(HERE, "plans", "_failed.json")))["clips"]
 except (OSError, ValueError, KeyError):
@@ -68,14 +116,15 @@ if n_blind:
     print(f"(second chances: {n_blind} refused clip(s) have no recorded reason or words - not offered)")
 waiting = 0
 if len(again) > AGAIN:
-    keep = sorted(again, key=lambda v: -len(again[v]))[:AGAIN]
+    keep = sorted(again, key=lambda v: (v not in undercut, -len(again[v])))[:AGAIN]
+    keep += [v for v in again if v in undercut and v not in keep]
     waiting = len(again) - AGAIN
     again = {v: again[v] for v in keep}
 if again:
     n = sum(len(v) for v in again.values())
     print(f"SECOND CHANCES: {n} clip(s) on {len(again)} episode(s) failed a gate - re-cut these FIRST "
           f"(PLANNING.md step 2c). Cues for each: work/<id>.srt")
-    for v, items in sorted(again.items(), key=lambda kv: -len(kv[1])):
+    for v, items in sorted(again.items(), key=lambda kv: (kv[0] not in undercut, -len(kv[1]))):
         print(f"  {v}  ({items[0][1]['plan']}, brand {items[0][1]['brand']})")
         for k, e in items:
             print(f"    {k}  in {e.get('in')} out {e.get('out')}  tries {e.get('tries', 1)}")
@@ -117,6 +166,18 @@ if not AR:
         print("NEWEST UPLOADS - PLAN THESE FIRST (same-day rule): " + ", ".join(
             f"{v} '{idx[v]['title'][:50]}' (published {_pub[v]})" for v in fresh))
     ready = fresh + [v for v in ready if v not in fresh]
+    for v, n in undercut.items():
+        _uses = sorted((float(c["in"]), float(c["out"]), c["slug"]) for k, q in _allplans.items()
+                       if k.startswith(MINE) and q.get("source", "")[:-4] == v for c in q.get("clips", []))
+        second[v] = _uses
+        _p = 2
+        while f"ep_{v}_p{_p}" in _allplans:
+            _p += 1
+        print(f"NEWEST UPLOAD UNDER-CUT - PLAN THIS FIRST: {v} '{idx[v]['title'][:50]}' (published {_pub[v]}, "
+              f"{idx[v].get('duration', 0) / 60:.0f} min): only {n} clip(s) posted/waiting/building, target "
+              f"{NEWEST_TARGET}+. Re-cut its SECOND CHANCES, then write factory/plans/ep_{v}_p{_p}.json with "
+              f"{max(NEWEST_TARGET - n, 3)}-{max(9 - n, 4)} NEW arcs from its unused minutes (PLANNING.md 'NEWEST UPLOAD UNDER-CUT').")
+    ready = list(undercut) + [v for v in ready if v not in undercut]
     # NEVER AN EMPTY RUN WHILE TRANSCRIBED EPISODES SIT UNUSED (14 Oct 2026). The month list
     # was used up, "READY TO PLAN: 0", and the planner spent three days only re-cutting
     # refused clips while 40+ downloaded, transcribed episodes were never offered. Top up
@@ -126,9 +187,89 @@ if not AR:
                          if e.get("transcript") and not e.get("test") and v not in _theirs
                          and v not in ready and f'"{v}.mp4"' not in plans_txt),
                         key=lambda v: _pub.get(v, ""), reverse=True)
-        if _spare:
+        if LANE:      # a lane brand only tops up from episodes whose title is on its lane (29 Oct 2026:
+            _tw = set(json.load(open(os.path.join(ROOT, "my_brand", "lane.json"))).get("topic_words", []))
+            _spare = [v for v in _spare if _tw & set(re.findall(r"[a-z]+", idx[v].get("title", "").lower()))]
+        if _spare:    # WB was handed 62 money episodes here, ignored them, and never reached its second pass)
             print(f"MONTH LIST USED UP - also ready (stocked, transcribed, never planned): {len(_spare)}")
         ready += _spare[:MAX - len(ready)]
+    # SECOND PASS (16 Oct 2026). An episode was "done" once planned, after 6-9 clips. KT's
+    # 37 planned episodes run 1,295 minutes and their plans touch 302 of them; a full read
+    # of two long interviews found 8 and 10 new arcs in the unused minutes, as strong as
+    # the first pick. So once new episodes run short, go back to an HD episode for arcs no
+    # clip has used. check_plan.py refuses any clip that re-uses another clip's minutes.
+    # Never while a clip of that source is still waiting to post or to be built: a new
+    # folder of the same video must not stack a third post on its day (RULES #21).
+    if len(ready) < MAX:
+        _named = {f[:-5]: json.load(open(os.path.join(HERE, "plans", f))) for f in os.listdir(os.path.join(HERE, "plans"))
+                  if f.endswith(".json") and not f.startswith("_")}
+        try:
+            _built = set(json.load(open(os.path.join(HERE, "plans", "_done.json"))))
+        except (OSError, ValueError):
+            _built = set()
+        _src = {q["brand"]: q["source"][:-4] for q in _named.values()}
+        _busy = ({_src.get(c["file"].split("/")[0]) for c in queue} | set(again)
+                 | {q["source"][:-4] for k, q in _named.items() if k not in _built})
+        _fenced = {q["source"][:-4] for k, q in _named.items() if k.startswith(THEIRS)} | _theirs
+        _used = {}
+        for k, q in _named.items():
+            if k.startswith(MINE):
+                _used.setdefault(q["source"][:-4], []).extend((float(c["in"]), float(c["out"]), c["slug"]) for c in q["clips"])
+        def _free(v):
+            t, end = 0.0, 60.0                     # the first minute is the intro
+            for a, b, _s in sorted(_used[v]):
+                t += max(0.0, a - end); end = max(end, b)
+            return t + max(0.0, idx[v].get("duration", 0) - 60 - end)
+        _cand = sorted(((_free(v), v) for v in _used
+                        if v in idx and idx[v].get("transcript") and idx[v].get("height", 0) >= 1080
+                        and idx[v].get("duration", 0) >= SECOND_MIN_EP * 60
+                        and v not in _busy and v not in _fenced and v not in ready), reverse=True)
+        _cand = [(t, v) for t, v in _cand if t >= SECOND_FREE * 60]
+        if _cand:
+            print(f"SECOND PASS - {len(_cand)} HD episode(s) already cut hold {sum(t for t, _ in _cand) / 3600:.1f} h "
+                  f"no clip has used. Plan NEW arcs from these after the new episodes (PLANNING.md 'SECOND PASS'):")
+        for t, v in _cand[:MAX - len(ready)]:
+            second[v] = sorted(_used[v])
+            print(f"  {v} '{idx[v]['title'][:50]}' {idx[v]['duration'] / 60:.0f} min, {t / 60:.0f} min unused, "
+                  f"{len(second[v])} clips already cut - write factory/plans/ep_{v}_p2.json (_p3 if taken)")
+        ready += list(second)
+    # HEALTH INSIDE KEVIN'S OTHER EPISODES (29 Oct 2026, Kamay: "there are maaaany moments in
+    # maaany videos of kt talking about health"). Only ~13 of his HD episodes are titled health,
+    # and WB had cut them all. His money and mindset episodes are HD and already stocked here;
+    # a lane brand now reads what he SAYS in them, not their titles. A 30-second block with 3+
+    # lane words is a health block; an episode with 4+ of them (2+ minutes) is offered, the
+    # most health talk first, and its reading holds only those stretches (+-60 s of context).
+    if LANE and len(ready) < MAX:
+        _vague = {"brain", "energy", "heart", "body", "pressure", "drug", "drugs", "drink", "water", "ate", "label", "labels"}
+        _tw = set(json.load(open(os.path.join(ROOT, "my_brand", "lane.json"))).get("topic_words", [])) - _vague
+        _scored = []
+        for v, e in idx.items():
+            if (v in ready or v in _theirs or not e.get("transcript") or e.get("test")
+                    or e.get("height", 0) < 1080 or e.get("status") in ("fetch_failed", "rejected")
+                    or f'"{v}.mp4"' in plans_txt):
+                continue
+            try:
+                open(f"/tmp/{v}.srt.enc", "wb").write(get(f"{v}.srt.enc"))
+                txt = subprocess.run(["openssl", "enc", "-d", "-aes-256-cbc", "-pbkdf2", "-pass", "env:TRANSCRIPT_KEY",
+                                      "-in", f"/tmp/{v}.srt.enc"], capture_output=True).stdout.decode("utf-8", "ignore")
+            except Exception:
+                continue
+            hits = {}
+            for h, m, sec, _ms, t in re.findall(r"(\d+):(\d+):(\d+)[,.](\d+) --> [^\n]+\n(.+?)(?:\n\n|\Z)", txt, re.S):
+                k = (int(h) * 3600 + int(m) * 60 + int(sec)) // 30 * 30
+                hits[k] = hits.get(k, 0) + sum(1 for w in re.findall(r"[a-z]+", t.lower()) if w in _tw)
+            dense = sorted(k for k, n in hits.items() if n >= 3)
+            if len(dense) >= 4:
+                _scored.append((len(dense), v, dense))
+        _scored.sort(reverse=True)
+        if _scored:
+            print(f"HEALTH INSIDE OTHER EPISODES - {len(_scored)} HD episode(s) not titled health hold health talk "
+                  f"({sum(n for n, _v, _d in _scored) / 2:.0f} min). Plan ONLY their health stretches "
+                  f"(PLANNING.md 'HEALTH INSIDE'): write factory/plans/ep_<id>.json as usual:")
+        for n, v, dense in _scored[:MAX - len(ready)]:
+            focus[v] = dense
+            print(f"  {v} '{idx[v]['title'][:50]}' {idx[v].get('duration', 0) / 60:.0f} min, ~{n / 2:.0f} min of health talk")
+            ready.append(v)
 print(f"READY TO PLAN: {len(ready)} episode(s); preparing {min(MAX, len(ready))}")
 # the second-chance episodes' cues come too, after the new ones (they need only work/<id>.srt)
 for v in ready[:MAX] + [v for v in again if v not in ready[:MAX] and v in idx and idx[v].get("transcript")]:
@@ -139,16 +280,42 @@ for v in ready[:MAX] + [v for v in again if v not in ready[:MAX] and v in idx an
     if r.returncode:
         print(f"  {v}: cannot decrypt ({r.stderr.strip()[-80:]}) - skip"); continue
     cues = re.findall(r"(\d+):(\d+):(\d+)[,.](\d+) --> [^\n]+\n(.+?)(?:\n\n|\Z)", open(srt, errors="ignore").read(), re.S)
-    blk = {}
+    blk, shown = {}, []
     for h, m, s, _ms, t in cues:
-        blk.setdefault((int(h) * 3600 + int(m) * 60 + int(s)) // 30 * 30, []).append(" ".join(t.split()))
-    open(os.path.join(WORK, f"{v}_blocks.txt"), "w").write("\n".join(f"{k} {' '.join(blk[k])}" for k in sorted(blk)))
+        x = int(h) * 3600 + int(m) * 60 + int(s)
+        # a second pass reads only what no clip has used; the used stretches are one line each
+        cut = next((c for c in second.get(v, []) if c[0] - 2 <= x <= c[1]), None)
+        if cut:
+            if cut not in shown:
+                shown.append(cut)
+                blk.setdefault(x // 30 * 30, []).append(f"=== USED by {cut[2]} ({cut[0]:.0f}-{cut[1]:.0f}s): taken, never cut inside ===")
+            continue
+        blk.setdefault(x // 30 * 30, []).append(" ".join(t.split()))
+    if v in focus:              # health stretches only, +-60 s; the rest is one marker line per gap
+        near = lambda k: any(abs(k - d) <= 60 for d in focus[v])
+        out, gap = [], False
+        for k in sorted(blk):
+            if near(k):
+                out.append(f"{k} {' '.join(blk[k])}"); gap = False
+            elif not gap:
+                out.append(f"{k} === not health: skipped ==="); gap = True
+        open(os.path.join(WORK, f"{v}_blocks.txt"), "w").write("\n".join(out))
+    else:
+        open(os.path.join(WORK, f"{v}_blocks.txt"), "w").write("\n".join(f"{k} {' '.join(blk[k])}" for k in sorted(blk)))
     e = idx[v]
     print(f"  {v}: '{e['title']}' {e.get('duration', 0) / 60:.0f} min -> work/{v}_blocks.txt (cues: work/{v}.srt)")
 
 waiting = [v for v in order if v not in idx or not idx[v].get("transcript")]
 print(f"MONTH LIST: {len(order)} episodes, {len(waiting)} not transcribed yet")
-if len(order) - len([v for v in order if f'"{v}.mp4"' in plans_txt]) < 6:
+# A DEAD EPISODE IS NOT STOCK (20 Oct 2026). Her list held 7 unplanned episodes, so this
+# never warned - but all 7 were dead (5 fetch_failed x3, 2 rejected at 480p). Her planner
+# only re-cut old refusals for days and her queue hit zero. Count only what can be planned.
+_dead = {v for v, e in idx.items() if e.get("status") in ("fetch_failed", "rejected")}
+_left = [v for v in order if f'"{v}.mp4"' not in plans_txt and v not in _dead]
+if [v for v in order if v in _dead and f'"{v}.mp4"' not in plans_txt]:
+    print("DEAD ON THE MONTH LIST (never downloaded / below 1080p, cannot be planned): "
+          + ", ".join(v for v in order if v in _dead and f'"{v}.mp4"' not in plans_txt))
+if len(_left) < 6:
     cat = json.load(open(os.path.join(HERE, "rumble_catalog.json")))
     series = json.load(open(os.path.join(HERE, "kt_series.json")))
     norm = lambda s: re.sub(r"[^a-z0-9]", "", s.lower())[:40]

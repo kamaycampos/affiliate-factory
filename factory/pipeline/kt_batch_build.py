@@ -120,7 +120,10 @@ def main():
         for c in keep:
             if c["slug"] in have:
                 continue
-            spec["clips"].append({k: c[k] for k in ("slug", "in", "out", "hook", "caption")
+            # "opener" (the cinematic shot), "no_layout" and "fix" travel too (17 Oct 2026):
+            # a field left off this list is a field the renderer never sees.
+            spec["clips"].append({k: c[k] for k in ("slug", "in", "out", "hook", "caption",
+                                                    "opener", "no_layout", "fix")
                                   if k in c} | ({"cta_kind": c["cta_kind"]} if c.get("cta_kind") else {}))
         spec["clips"].sort(key=lambda x: float(x["in"]))
     json.dump(series, open(SERIES, "w"), indent=1)
@@ -143,10 +146,56 @@ def main():
             if not m or m.group(1) not in slugs:
                 continue
             mp4 = os.path.join(bdir, f)
+            anchors = os.path.splitext(mp4)[0] + "__anchors.json"
+            senv = dict(os.environ, SYNC_ANCHORS=anchors)
             s = subprocess.run([sys.executable, os.path.join(HOME, "kt_sync_check.py"), mp4],
-                               capture_output=True, text=True, cwd=HOME)
+                               capture_output=True, text=True, cwd=HOME, env=senv)
+            off = constant_offset(s.stdout) if s.returncode else None
+            shift = None
+            if off is not None:
+                # every caption late (or early) by the same amount: move them by the
+                # measured amount, render this clip once more, and judge it again
+                log(f"  RETIME {f}: captions {off:+.2f}s off throughout - re-rendering once")
+                rr = subprocess.run([sys.executable, os.path.join(HOME, "kt_render.py"), key, "--apply",
+                                     "--only", m.group(1)], capture_output=True, text=True, cwd=HOME,
+                                    env=dict(os.environ, CAPTION_SHIFT=f"{-off:.3f}"))
+                if rr.returncode or "captions moved" not in rr.stdout:
+                    log(f"  RETIME render did not apply: {(rr.stdout + rr.stderr)[-300:]}")
+                else:
+                    shift = f"{-off:.3f}"
+                s = subprocess.run([sys.executable, os.path.join(HOME, "kt_sync_check.py"), mp4],
+                                   capture_output=True, text=True, cwd=HOME, env=senv)
+            # WARP: a few captions off, not all of them (29 Oct 2026, kt_render.warp_words).
+            # Once per clip, only for timing - speech with no caption is a different fault.
+            if (s.returncode and "captions vs the sound" in s.stdout and "UNCAPTIONED" not in s.stdout
+                    and os.path.exists(anchors)):
+                log(f"  WARP {f}: {s.stdout.strip()[-120:]} - re-timing each caption once")
+                wenv = dict(os.environ, CAPTION_WARP=anchors) | ({"CAPTION_SHIFT": shift} if shift else {})
+                rr = subprocess.run([sys.executable, os.path.join(HOME, "kt_render.py"), key, "--apply",
+                                     "--only", m.group(1)], capture_output=True, text=True, cwd=HOME, env=wenv)
+                if rr.returncode or "re-timed word by word" not in rr.stdout:
+                    log(f"  WARP render did not apply: {(rr.stdout + rr.stderr)[-300:]}")
+                s = subprocess.run([sys.executable, os.path.join(HOME, "kt_sync_check.py"), mp4],
+                                   capture_output=True, text=True, cwd=HOME)
+            if os.path.exists(anchors):
+                os.remove(anchors)
             if s.returncode:
                 log(f"  FAIL {f}: {s.stdout.strip()[-220:]}")
+                for side in glob.glob(os.path.splitext(mp4)[0] + "*"):
+                    shutil.move(side, os.path.join(FAILED, os.path.basename(side)))
+                continue
+            plan_c = slugs[m.group(1)]
+            seen = speaker_in_frame(mp4, opener=bool(plan_c.get("opener")))
+            if seen and not seen[0]:
+                cxs = source_face_cx(os.path.join(SRC_DIR, p["source"]), float(plan_c["in"]), float(plan_c["out"]))
+                if cxs is not None:
+                    log(f"  REAIM {f}: {seen[1]} - crop moved to the speaker at x={cxs:.2f}, rendering once more")
+                    renv = dict(os.environ, CROP_CX=f"{cxs:.3f}") | ({"CAPTION_SHIFT": shift} if shift else {})
+                    subprocess.run([sys.executable, os.path.join(HOME, "kt_render.py"), key, "--apply",
+                                    "--only", m.group(1)], capture_output=True, text=True, cwd=HOME, env=renv)
+                    seen = speaker_in_frame(mp4, opener=bool(plan_c.get("opener")))
+            if seen and not seen[0]:
+                log(f"  FAIL {f}: speaker not in the posted frame ({seen[1]})")
                 for side in glob.glob(os.path.splitext(mp4)[0] + "*"):
                     shutil.move(side, os.path.join(FAILED, os.path.basename(side)))
                 continue
@@ -197,6 +246,95 @@ def main():
         log("pushed")
     return finish()
 
+
+
+# THE SPEAKER IS IN THE POSTED FRAME (1 Nov 2026). Kamay, on WB "Why your grocery bag
+# outlasts you": "there is no kt". The face gate (run_plans) looked at the WIDE source, where
+# Kevin sat on the left; the 9:16 crop took the middle - a curtain and his shoulder - and
+# nothing looked at what was actually posted. Now the finished clip is checked: a face in
+# the opening second and in most of the clip. Missing: the crop is re-aimed at the face the
+# SOURCE shows (CROP_CX) and rendered once more; still missing: refused.
+_YN = []
+
+
+def _faces(path, t):
+    """[(x centre as a fraction of width, face width fraction)] at t, or None without a detector."""
+    try:
+        import cv2
+    except Exception:
+        return None
+    if not _YN:
+        model = os.path.join(HOME, "bin", "yunet.onnx")
+        if not (os.path.exists(model) and hasattr(cv2, "FaceDetectorYN_create")):
+            return None
+        _YN.append(cv2.FaceDetectorYN_create(model, "", (320, 320), 0.6, 0.3, 5000))
+    q = f"/tmp/_frame_{os.getpid()}.jpg"
+    subprocess.run([os.path.join(HOME, "bin", "ffmpeg") if os.path.exists(os.path.join(HOME, "bin", "ffmpeg")) else "ffmpeg",
+                    "-y", "-loglevel", "error", "-ss", f"{t:.2f}", "-i", path, "-frames:v", "1",
+                    "-vf", "scale=640:-2", "-q:v", "3", q], capture_output=True)
+    img = cv2.imread(q)
+    if img is None:
+        return None
+    h, w = img.shape[:2]
+    _YN[0].setInputSize((w, h))
+    _, found = _YN[0].detect(img)
+    return [((f[0] + f[2] / 2) / w, f[2] / w) for f in (found if found is not None else []) if f[2] / w >= 0.04]
+
+
+def _length(path):
+    """Seconds, read from ffmpeg's own header line (ffprobe is not on every machine)."""
+    ff = os.path.join(HOME, "bin", "ffmpeg")
+    try:
+        r = subprocess.run([ff if os.path.exists(ff) else "ffmpeg", "-i", path], capture_output=True, text=True)
+    except OSError:
+        return 0.0
+    m = re.search(r"Duration: (\d+):(\d+):([\d.]+)", r.stderr)
+    return int(m[1]) * 3600 + int(m[2]) * 60 + float(m[3]) if m else 0.0
+
+
+def speaker_in_frame(mp4, opener=False):
+    """None = cannot tell (no detector). Else (ok, why)."""
+    d = _length(mp4)
+    if d <= 2:
+        return None
+    first = [] if opener else [0.5, 1.5]                 # an opener is B-roll by design
+    body = [d * x for x in (0.3, 0.5, 0.7, 0.9)]
+    seen = {t: _faces(mp4, t) for t in first + body}
+    if all(v is None for v in seen.values()):
+        return None
+    hit = {t: bool(v) for t, v in seen.items()}
+    if first and not any(hit[t] for t in first):
+        return False, "no face in the opening second of the posted frame"
+    if sum(hit[t] for t in body) < 2:      # a very tight face (forehead cropped) can be missed; 2 of 4 is enough
+        return False, f"face in only {sum(hit[t] for t in body)} of 4 moments of the posted frame"
+    return True, ""
+
+
+def source_face_cx(src, a, b):
+    """Where the speaker sits across the clip in the SOURCE (median x centre), or None."""
+    xs = []
+    for k in range(6):
+        f = _faces(src, a + (b - a) * (k + 0.5) / 6)
+        if f:
+            xs.append(max(f, key=lambda z: z[1])[0])
+    return sorted(xs)[len(xs) // 2] if len(xs) >= 3 else None
+
+
+def constant_offset(sync_out):
+    """The median offset when a sync FAIL is one constant shift, else None.
+
+    6 Oct 2026: 38 clips failed caption timing since 23 Sept; on about ten of them
+    every caption was off by the same amount (median +0.64s, worst-10% 0.69s).
+    That is a shift, and a shift is measured, so it can be undone. Drift (worst far
+    beyond the median), speech left uncaptioned, or too little to judge is not."""
+    m = re.search(r"median ([+-]?[\d.]+)s\s+worst-10% ([\d.]+)s", sync_out)
+    cov = re.search(r"words captioned (\d+)%", sync_out)
+    if not m or "UNCAPTIONED" in sync_out or (cov and int(cov.group(1)) < 85):
+        return None
+    med, p90 = float(m.group(1)), float(m.group(2))
+    if abs(med) <= 0.30 or p90 - abs(med) > 0.40 or abs(med) > 3.0:
+        return None
+    return med
 
 
 def closes_wrong(verify_out, named):

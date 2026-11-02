@@ -34,6 +34,12 @@ FF = os.path.expanduser("~/Kamay/bin/ffmpeg")
 MIN_SECS, MAX_SECS = 8.0, 185.0
 CONNECTORS = {"and", "or", "to", "of", "after", "upon", "by", "over", "on", "the", "a",
               "as"}   # "us as us", "as good as": 13 Oct 2026
+# words a sentence cannot end on: a capital He / His / Him right after one is reverent
+# ("will He care"), while "the market He" is still a missing full stop
+CANT_END = {"will", "would", "shall", "should", "can", "could", "may", "might", "must", "does",
+            "did", "do", "has", "have", "had", "is", "was", "are", "were", "be", "to", "for",
+            "of", "with", "from", "by", "in", "on", "that", "and", "but", "or", "if", "when",
+            "because", "as", "so", "how", "what", "why", "where", "than", "let", "make", "makes"}
 LIST_JOIN = {"or", "and", "nor", "than", "versus", "vs"}
 CLAUSE = {"that", "which", "who", "whom", "whose", "whether"}
 COPULA = {"is", "are", "was", "were", "be", "not", "isn't", "aren't", "wasn't", "no"}
@@ -157,9 +163,48 @@ def text_faults(caps):
         # bad ones, because either way nobody believes what it says.
         if (not flat[i].endswith((".", "!", "?", ",", ":", ";", "-", '"'))
                 and norm[i + 1] in STARTERS and flat[i + 1][:1].isupper()
+                # a reverent capital for God mid-sentence: "how much more will He care
+                # for you" (VSC WORRY-ABOUT-NOTHING, 15 Oct 2026)
+                and not (flat[i + 1].strip(",.?!") in ("He", "His", "Him") and norm[i] in CANT_END)
+                # a TITLE in title case, not a sentence: "a great book called The Power of
+                # Now" (VSC FOCUS-ONLY-ON-TODAY, 28 Oct 2026) - the next word is capitalised
+                # and starts no sentence ("The Power"), or this is a small word inside the
+                # title right after a capitalised one ("Power of Now")
+                and not (i + 2 < len(flat) and flat[i + 2][:1].isupper()
+                         and norm[i + 2] not in STARTERS)
+                and not (norm[i] in ("of", "the", "and", "in", "on", "for", "to", "a", "an")
+                         and i > 0 and flat[i - 1][:1].isupper() and norm[i - 1] not in STARTERS
+                         and not flat[i - 1].endswith((".", "!", "?")))
                 and not flat[i][:1].isupper()):
             out.append(f'sentence starts with no stop: "{flat[i]} {flat[i+1]}"')
     return sorted(set(out))
+
+
+def trim_tail(mp4, why):
+    """A clip whose ONLY fault is its last line ends at the last full stop instead.
+
+    20 Oct 2026, Kamay: WB posts once a day and the slot sat empty two nights running.
+    5 of the last 6 clips the last gate blocked were good teachings cut at a bad
+    edge; "Why your vegan food isn't healthy" ran 0.8s past "...chemicals in food
+    packaging." into "And it says,". Only the END is trimmed: the hook is drawn on
+    the first HOOK_SECS, so a bad start still fails. True when the file was cut
+    (the caller checks it again)."""
+    if not why or not all(w.startswith("ends mid-thought") for w in why):
+        return False
+    side = mp4[:-4] + "__caps.json"
+    caps = json.load(open(side))
+    ends = [i for i, c in enumerate(caps) if c[2].rstrip().endswith((".", "!", "?", '"'))]
+    if not ends or caps[ends[-1]][1] + 0.12 < MIN_SECS:
+        return False
+    t = caps[ends[-1]][1] + 0.12
+    tmp = mp4[:-4] + ".trim.mp4"
+    r = sh(FF, "-nostdin", "-y", "-i", mp4, "-t", f"{t:.2f}", "-c", "copy",
+           "-movflags", "+faststart", tmp)
+    if r.returncode or not os.path.exists(tmp):
+        return False
+    os.replace(tmp, mp4)
+    json.dump(caps[:ends[-1] + 1], open(side, "w"))
+    return True
 
 
 def check(mp4, samples=12):

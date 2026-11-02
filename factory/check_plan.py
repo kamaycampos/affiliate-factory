@@ -112,6 +112,90 @@ def recent_hooks(n=40):
     return [c["hook"] for c in sorted(posted, key=lambda c: c["posted_at"])[-n:]]
 
 
+# THE BRAND'S LANE, IN CODE (17 Oct 2026). WB's second post was a parenting story
+# ("Why your mom yelled at you") on a health brand, opening on "You're not stupid".
+# TikTok took it down. Kamay: "we are supposed to post high quality valuable health
+# related information, not claims, just information." A brand that writes
+# my_brand/lane.json gets three refusals: the clip must be ON the lane (a topic word in
+# the hook or caption), our own words never claim (no cure / treat / heal / kills in the
+# hook or caption), and nothing harsh in the opening seconds (start_words, hook, or the
+# first 8s of the transcript when it is in work/). A brand without the file is untouched.
+def _lane():
+    p = os.path.join(os.path.dirname(HERE), "my_brand", "lane.json")
+    try:
+        return json.load(open(p))
+    except Exception:
+        return None
+
+
+def _words(xs):
+    return re.compile(r"\b(" + "|".join(re.escape(x) for x in xs) + r")\b", re.I) if xs else None
+
+
+def _opening_text(src, t0, secs=8.0):
+    """The transcript's words in the clip's first seconds, if the .srt is in work/."""
+    vid = re.sub(r"\.mp4$", "", str(src))
+    p = os.path.join(os.path.dirname(HERE), "work", vid + ".srt")
+    if not os.path.exists(p):
+        return ""
+    def sec(t):
+        h, m, s = t.replace(",", ".").split(":")
+        return int(h) * 3600 + int(m) * 60 + float(s)
+    out = []
+    for block in open(p, encoding="utf-8", errors="ignore").read().split("\n\n"):
+        m = re.search(r"(\d+:\d+:\d+[,.]\d+)\s*-->\s*(\d+:\d+:\d+[,.]\d+)\s*\n(.*)", block, re.S)
+        if m and sec(m.group(2)) > t0 - 1 and sec(m.group(1)) < t0 + secs:
+            out.append(m.group(3).replace("\n", " "))
+    return " ".join(out)
+
+
+def lane_problems(p, c):
+    L = _lane()
+    if not L:
+        return []
+    errs, s = [], c.get("slug", "?")
+    hook, cap = " ".join(c.get("hook") or []), c.get("caption", "")
+    body = cap.split("#")[0]
+    topic, claim, harsh = (_words(L.get(k)) for k in ("topic_words", "claim_words", "harsh_words"))
+    # The HOOK must name the subject: the mom clip's caption said "eating dirt" and
+    # would have passed a caption test. Every good WB hook so far names it (water,
+    # supplements, healthy 90-year-olds).
+    if topic and not topic.search(hook):
+        errs.append(f"{s}: OFF THE {L.get('name', '').upper()} LANE - the hook names nothing from "
+                    f"my_brand/lane.json topic_words (food, water, vitamins, the body...)")
+    for where, txt in (("hook", hook), ("caption", body)):
+        m = claim and claim.search(txt)
+        if m:
+            errs.append(f"{s}: {where} makes a claim ('{m.group(0)}') - share the information, never "
+                        f"a cure/treat/heal/kill claim in our own words")
+    opening = " ".join([str(c.get("start_words") or ""), hook,
+                        _opening_text(p.get("source"), float(c.get("in") or 0))])
+    m = harsh and harsh.search(opening)
+    if m:
+        errs.append(f"{s}: harsh word in the first seconds ('{m.group(0)}') - platforms flag it and "
+                    f"it is not the brand; open on a different sentence")
+    # THE WHOLE CLIP, NOT ONLY THE OPENING (18 Oct 2026). WB's vitamin E clip ended on
+    # "What the hell are we making?" and TikTok removed it - the 2nd removal in a row.
+    # Harsh words anywhere, and the words TikTok removes health videos for, refuse the cut:
+    # move an edge so they fall outside, or pick another moment.
+    t0, t1 = float(c.get("in") or 0), float(c.get("out") or 0)
+    whole = _opening_text(p.get("source"), t0, max(0.0, t1 - t0))
+    risky = _words(L.get("tiktok_removal_words"))
+    hit = harsh and (harsh.search(whole) or harsh.search(hook + " " + body))
+    if hit and not m:
+        errs.append(f"{s}: harsh word inside the clip ('{hit.group(0)}') - TikTok removed 2 WB clips "
+                    f"with one ('stupid', 'hell'); move an edge so it falls outside, or choose another moment")
+    # Words TikTok is known to remove health videos for: a WARNING (no removal has been
+    # traced to one yet). Prefer a cut without them; in the hook or caption it is an error.
+    rk = risky and risky.search(hook + " " + body)
+    if rk:
+        errs.append(f"{s}: '{rk.group(0)}' in our own hook/caption - TikTok removes health posts for it")
+    rk = risky and risky.search(whole)
+    if rk:
+        print(f"   ~ {s}: '{rk.group(0)}' is spoken inside the clip - TikTok may remove it; prefer a cut without it")
+    return errs
+
+
 bad = 0
 tired = overexposed(recent_hooks())
 if tired:
@@ -123,6 +207,7 @@ WIND_UP = re.compile(
     r"|there'?s (two|three|four|five|six|seven|\d+) (reasons|things|ways|steps|keys)"
     r"|there are (two|three|four|five|six|seven|\d+) (reasons|things|ways|steps|keys)"
     r"|(first|number one|step one)\b", re.I)
+OVERLAP_MAX = 10.0     # seconds two clips of one source may share (a border sentence)
 others = {}
 for f in os.listdir(os.path.join(HERE, "plans")):
     if f.endswith(".json") and not f.startswith("_"):
@@ -143,11 +228,46 @@ for path in sys.argv[1:]:
     if not re.fullmatch(r"v[a-z0-9]+\.mp4", p.get("source", "")): errs.append("source must be <rumble id>.mp4")
     slugs = [c.get("slug") for c in p.get("clips", [])]
     if len(slugs) != len(set(slugs)): errs.append("duplicate slugs")
+    # ONE ARC, ONE CLIP - ACROSS PLANS TOO (16 Oct 2026). An episode is not "done" after
+    # its first 6-9 clips: KT's 37 planned episodes are 1,295 minutes and their plans
+    # touch 302 of them. A SECOND PASS (PLANNING.md) goes back for new arcs, and this is
+    # what keeps it honest: no clip may re-use another clip's minutes. A re-cut of the
+    # same arc (same slug, or the slug its retry_of names) is the one exception; a shared
+    # sentence at a border (up to OVERLAP_MAX) is not a repeat. Kamay's lane only.
+    if fam == "KT":
+        for c in p.get("clips", []):
+            a, z = float(c["in"]), float(c["out"])
+            same = {c.get("slug"), str(c.get("retry_of") or "").split("/")[-1]}
+            for f, o in sorted(others.items()):
+                if o.get("source") != p.get("source"):
+                    continue
+                for d in o.get("clips", []):
+                    if d.get("slug") in same or str(d.get("retry_of") or "").split("/")[-1] == c.get("slug"):
+                        continue
+                    ov = min(z, float(d["out"])) - max(a, float(d["in"]))
+                    if ov > OVERLAP_MAX:
+                        errs.append(f"{c.get('slug')}: re-uses {ov:.0f}s of {f[:-5]}/{d.get('slug')} "
+                                    f"({float(d['in']):.0f}-{float(d['out']):.0f}s) - a new clip takes only "
+                                    f"minutes no clip has used; move the edges or drop it")
     for c in p.get("clips", []):
         s = c.get("slug", "?"); d = float(c["out"]) - float(c["in"])
         if not re.fullmatch(r"[A-Z0-9]+(-[A-Z0-9]+)*", s): errs.append(f"{s}: slug must be UPPER-DASHED")
         if not MIN_LEN <= d <= MAX_LEN: errs.append(f"{s}: length {d:.0f}s outside {MIN_LEN:.0f}-{MAX_LEN:.0f}")
         for e in lint(c.get("hook") or [], b): errs.append(f"{s}: hook - {e}")
+        th = c.get("trial_hooks")
+        if th is not None:
+            if not isinstance(th, list) or not 3 <= len(th) <= 7:
+                errs.append(f"{s}: trial_hooks must be a list of 3-7 hooks")
+            else:
+                for k, alt in enumerate(th, 1):
+                    alt = alt if isinstance(alt, list) else [alt]
+                    for e in lint(alt, b):
+                        # the opening-word rule is exactly what trials test (1 Nov 2026): a trial
+                        # hook may open on a name, a sum or a command; length and the rest still hold
+                        if "not a direct promise" not in e:
+                            errs.append(f"{s}: trial hook {k} - {e}")
+                if sum(1 for q in p.get("clips", []) if q.get("trial_hooks")) > 1:
+                    errs.append("trial_hooks on more than one clip: one experiment a day")
         ns = no_stakes(c.get("hook") or [], b)
         if ns and (STAKES_WARN or fam == "AR"): print(f"   ~ {s}: hook - {ns}")
         elif ns: errs.append(f"{s}: hook - {ns}")
@@ -173,6 +293,17 @@ for path in sys.argv[1:]:
         # a filler word or a pointer back is the wind-up BEFORE the line; open on the line.
         if fam == "KT" and WIND_UP.match(str(c.get("start_words") or "").strip()):
             errs.append(f"{s}: opens on a wind-up ('{c.get('start_words')}') - start on the sharpest line itself (FIRST_3_SECONDS.md)")
+        # THE CINEMATIC OPENER (17 Oct 2026): a 2-6 word stock-footage search for a moving
+        # shot that IS the hook's subject. Plain words only; never a person's, brand's or
+        # film's name (stock libraries do not carry them and we never use film footage).
+        op = c.get("opener")
+        if op is not None:
+            if not isinstance(op, str) or not re.fullmatch(r"[a-z][a-z ]{2,60}", op.strip()) \
+                    or not 2 <= len(op.split()) <= 6:
+                errs.append(f"{s}: opener must be 2-6 plain lowercase words, e.g. \"tap water pouring glass\"")
+            elif re.search(r"\b(movie|film|scene|trailer|nba|nfl|celebrity|logo|jordan|kevin|trudeau)\b", op):
+                errs.append(f"{s}: opener '{op}' names a film/brand/person - describe the picture instead")
+        errs += lane_problems(p, c)
     print(f"{name}: {'OK' if not errs else 'PROBLEMS'} ({len(slugs)} clips)")
     for e in errs: print("   -", e)
     bad += bool(errs)

@@ -19,13 +19,39 @@ root = sys.argv[1]
 results = [json.load(open(f)) for f in glob.glob(os.path.join(root, "*", "result.json"))]
 by_plan = {}
 for r in results:
-    by_plan.setdefault(r["plan"], []).append(r)
+    if not r.get("variant_shard"):                 # trial variants only (shard.py), no clips
+        by_plan.setdefault(r["plan"], []).append(r)
 sys.path.insert(0, K)
 import kt_lock  # noqa: E402  (mark published clips before anything re-renders)
 print("locked now published:", kt_lock.sync())
 series = json.load(open(SERIES))
 done = json.load(open(os.path.join(HERE, "plans", "_done.json")))
 brands, kinds, report = set(), {}, []
+# SECOND CHANCES. 6 Oct 2026: 205 clips planned, 103 queued - and every clip that
+# failed a gate was simply gone, because a plan that yields one clip is "built".
+# Both accounts ran dry. A failed clip is now written here with why it failed,
+# routine_prep.py hands it back to the planner, and the planner re-cuts it.
+FAILED = os.path.join(HERE, "plans", "_failed.json")
+failed = json.load(open(FAILED)) if os.path.exists(FAILED) else {"clips": {}, "attempts": {}}
+RETIRE_AFTER = 2       # a plan that yields NOTHING this many runs is not retried as-is
+
+
+def note_failures(plan, p, kept, text):
+    """Every planned clip that did not reach the queue, with the gate's words."""
+    for c in p["clips"]:
+        if c["slug"] in kept:
+            failed["clips"].pop(f"{plan}/{c['slug']}", None)
+            continue
+        why = [l.strip(" -*") for l in text.splitlines() if c["slug"] in l
+               and any(k in l for k in ("FAIL", "drop", "NOT QUEUED", "refused"))]
+        # a re-cut carries "retry_of": its tries continue the original's count, so
+        # one clip is offered back at most MAX_TRIES times in all (routine_prep.py)
+        prev = failed["clips"].get(c.get("retry_of", ""), {}).get("tries", 0)
+        failed["clips"][f"{plan}/{c['slug']}"] = {
+            "plan": plan, "source": p["source"], "brand": p["brand"],
+            "tries": max(prev, failed["clips"].get(f"{plan}/{c['slug']}", {}).get("tries", 0)) + 1,
+            "why": [w[:300] for w in why[:3]] or ["no clip came out of the render"],
+            **{k: c[k] for k in ("slug", "in", "out", "start_words", "end_words", "hook") if k in c}}
 for plan, rs in sorted(by_plan.items()):
     p = json.load(open(os.path.join(HERE, "plans", f"{plan}.json")))
     passed = [c for r in sorted(rs, key=lambda r: r["shard"]) for c in r["clips"]]
@@ -40,6 +66,16 @@ for plan, rs in sorted(by_plan.items()):
     # silently lost. A plan that yields nothing stays pending and is retried.
     if passed or p.get("test"):
         done.append(plan)
+    if not passed and not p.get("test"):
+        # 2 Oct - 6 Oct: ep_v733zpw failed the same four clips the same way on six
+        # runs in a row. A render is deterministic; a retry of the same cut is the
+        # same answer. After RETIRE_AFTER runs its clips go back to the planner.
+        n = failed["attempts"][plan] = failed["attempts"].get(plan, 0) + 1
+        if n >= RETIRE_AFTER:
+            done.append(plan)
+            note_failures(plan, p, set(), "\n".join(report))
+            report.append(f"- **RETIRED** after {n} runs with nothing passing; its clips go back "
+                          f"to the planner (factory/plans/_failed.json)")
     if p.get("test") or not passed:
         continue
     spec = series.setdefault(plan, {"source": p["source"], "brand": p["brand"],
@@ -62,6 +98,9 @@ for plan, rs in sorted(by_plan.items()):
             if not (f.endswith(".mp4") and "__" not in f):
                 continue
             v, why = kt_qc.check(os.path.join(d, f))
+            if v == "fail" and kt_qc.trim_tail(os.path.join(d, f), why):
+                print(f"  TRIMMED {f}: {why[0]} - now ends on the last full sentence", flush=True)
+                v, why = kt_qc.check(os.path.join(d, f))
             if v == "fail":
                 blocked.add(f)
                 report.append(f"- **NOT QUEUED** `{f}` - {'; '.join(why[:3])}")
@@ -71,6 +110,7 @@ for plan, rs in sorted(by_plan.items()):
                 if not any(f"_{c['slug']}_" in b for b in blocked)}
         passed = [c for c in passed if c["slug"] in keep]
         spec["clips"] = [c for c in spec["clips"] if c["slug"] in keep or c["slug"] in have]
+    note_failures(plan, p, {c["slug"] for c in passed}, "\n".join(report))
     for r in rs:
         for f in r["files"]:
             if any(f.startswith(b[:-4]) for b in blocked):
@@ -84,8 +124,13 @@ for plan, rs in sorted(by_plan.items()):
 json.dump(series, open(SERIES, "w"), indent=1, ensure_ascii=False)
 shutil.copy(SERIES, os.path.join(HERE, "kt_series.json"))
 json.dump(sorted(set(done)), open(os.path.join(HERE, "plans", "_done.json"), "w"), indent=1)
+json.dump(failed, open(FAILED, "w"), indent=1, ensure_ascii=False)
 if brands:
-    subprocess.run(["git", "pull", "-q", "--rebase"], cwd=MACHINE)
+    # NO PULL HERE (14 Oct 2026). kt_series.json, _done.json and _failed.json are already
+    # written, so a plain pull refuses the dirty tree and an --autostash pull merged
+    # them with conflict markers that the Save step then committed - every factory
+    # run failed on kt_series.json until it was repaired. The queue job checks out
+    # main itself (factory.yml), so the tree is current when this starts.
     up = subprocess.run([sys.executable, "add_clips.py", *sorted(brands)], cwd=MACHINE,
                         capture_output=True, text=True)
     report.append("## UPLOAD\n" + up.stdout[-2500:] + up.stderr[-500:])
@@ -96,6 +141,39 @@ if brands:
             c["cta_kind"] = kinds[c["file"]]
     json.dump(man, open(man_p, "w"), indent=1)
     subprocess.run([sys.executable, "make_thumbs.py"], cwd=MACHINE, capture_output=True)
+# TRIAL REEL VARIANTS (1 Nov 2026, build_shard.py): upload each to the media release and list
+# the experiment in state/variants.json; run_once.py posts them once the clip has posted.
+_vp = os.path.join(MACHINE, "state", "variants.json")
+try:
+    _var = json.load(open(_vp))
+except (OSError, ValueError):
+    _var = {}
+_man = [c["file"] for c in json.load(open(os.path.join(MACHINE, "state", "manifest.json")))["clips"]]
+for r in sorted(results, key=lambda r: str(r["shard"])):
+    for slug, vs in (r.get("variants") or {}).items():
+        clip = next((f for f in _man if f.startswith(r["brand"] + "/") and f"_{slug}_" in f), None)
+        old = _var.get(f"{r['brand']}__{slug}")
+        if not clip or (old and old.get("posted")):
+            continue
+        # several variant shards add arms to ONE experiment (2 Nov 2026)
+        arms = [a for a in (old or {}).get("arms", [])]
+        have = {a["rel"] for a in arms}
+        vs = [v for v in vs if "_VARIANTS/" + v["file"] not in have]
+        for v in vs:
+            src = os.path.join(root, f"shard-{r['plan']}-{r['shard']}", v["file"])
+            asset = "_VARIANTS--" + v["file"]
+            tmp = os.path.join("/tmp", asset)
+            shutil.copy(src, tmp)
+            up = subprocess.run(["gh", "release", "upload", "media", tmp, "--clobber",
+                                 "-R", os.environ.get("GITHUB_REPOSITORY", "YOUR-GITHUB-NAME/YOUR-REPO")],
+                                capture_output=True, text=True)
+            if up.returncode == 0:
+                arms.append({"rel": "_VARIANTS/" + v["file"], "hook": v["hook"]})
+        if arms and vs:
+            arms.sort(key=lambda a: a["rel"])
+            _var[f"{r['brand']}__{slug}"] = {"clip": clip, "arms": arms, "posted": None}
+            report.append(f"## TRIAL: {len(arms)} hook variant(s) of {clip} ready for Instagram Trial Reels")
+json.dump(_var, open(_vp, "w"), indent=1, ensure_ascii=False)
 os.makedirs(os.path.join(HERE, "reports"), exist_ok=True)
 open(os.path.join(HERE, "reports", "latest.md"), "w").write("\n\n".join(report))
 print("\n\n".join(report)[-4000:])
