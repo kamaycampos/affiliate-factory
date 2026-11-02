@@ -78,18 +78,40 @@ def main():
     # on this computer - `plan` needs TRANSCRIPT_KEY to read the transcripts - and
     # straight into GitHub's secrets with `gh`. A key printed into a chat is a leaked key;
     # a key stored only in GitHub is one `plan` can never use.
+    # A KEY ALREADY IN GITHUB IS NEVER REPLACED (2 Nov 2026). `update` re-runs this file; on a
+    # computer without the private keys file it made two NEW keys and overwrote the secrets,
+    # and every encrypted video and transcript the factory had stored could no longer be read.
+    def have():
+        try:
+            r = subprocess.run(["gh", "secret", "list", "-R", repo], capture_output=True, text=True)
+        except FileNotFoundError:
+            return None
+        return {l.split()[0] for l in r.stdout.splitlines() if l.strip()} if r.returncode == 0 else None
+    there = have()
+    if there is None:
+        print("Keys: not checked - `gh` is missing or not signed in (`gh auth login --web`), so nothing was "
+              "created or stored. Re-run once it works.")
+        print()
+        print(f"Your board will live at https://{pages}/")
+        return
+    missing = [k for k in ("FACTORY_KEY", "TRANSCRIPT_KEY") if k not in there]
     keys = os.path.expanduser(f"~/.{name}.keys")
-    if not os.path.exists(keys):
-        old = os.umask(0o077)
-        open(keys, "w").write(f"FACTORY_KEY={secrets.token_urlsafe(32)}\nTRANSCRIPT_KEY={secrets.token_urlsafe(32)}\n")
-        os.umask(old)
-    os.chmod(keys, 0o600)
-    vals = dict(l.split("=", 1) for l in open(keys).read().split() if "=" in l)
-    stored = []
-    for k in ("FACTORY_KEY", "TRANSCRIPT_KEY"):
-        r = subprocess.run(["gh", "secret", "set", k, "-R", repo], input=vals[k].encode(), capture_output=True)
-        stored.append(k if r.returncode == 0 else f"{k} (NOT stored - run `gh auth login --web` and re-run)")
-    print(f"Keys saved privately in {keys} (only you can read it) and stored in GitHub: {', '.join(stored)}")
+    if not missing:
+        print("Keys: FACTORY_KEY and TRANSCRIPT_KEY are already in GitHub - kept as they are."
+              + ("" if os.path.exists(keys) else f" (`plan` on this computer needs them in {keys}: copy that file "
+                 "from the computer you set up on.)"))
+    else:
+        if not os.path.exists(keys):
+            old = os.umask(0o077)
+            open(keys, "w").write(f"FACTORY_KEY={secrets.token_urlsafe(32)}\nTRANSCRIPT_KEY={secrets.token_urlsafe(32)}\n")
+            os.umask(old)
+        os.chmod(keys, 0o600)
+        vals = dict(l.split("=", 1) for l in open(keys).read().split() if "=" in l)
+        stored = []
+        for k in missing:
+            r = subprocess.run(["gh", "secret", "set", k, "-R", repo], input=vals[k].encode(), capture_output=True)
+            stored.append(k if r.returncode == 0 else f"{k} (NOT stored - run `gh auth login --web` and re-run)")
+        print(f"Keys saved privately in {keys} (only you can read it) and stored in GitHub: {', '.join(stored)}")
     print("Still to set: OFFER_URL (their affiliate link):  gh secret set OFFER_URL")
     print()
     print("Then: Settings -> Pages -> Deploy from a branch -> main, /docs -> Save")
