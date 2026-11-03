@@ -43,15 +43,15 @@ teaching or a question; the machine adds the one true offer line from that file.
 DM does not send ("the cheat sheet", "my list", "I'll tell you"): the machine deletes such a sentence. On the
 live account, captions had promised 9 different freebies while the comment only ever sent one link.
 
-## Trial hooks: 7 hooks, 1 clip, every day (1 Nov 2026)
-In the MORNING run (before 15:00 UTC) only, pick the ONE strongest clip you plan (the newest episode's best
-when there is one) and add `"trial_hooks"`: exactly 7 alternatives to its hook, each `["line one", "line two"]`,
+## Trial hooks: 7 hooks on every clip (3 Nov 2026)
+Give EVERY clip you plan `"trial_hooks"`: exactly 7 alternatives to its hook, each `["line one", "line two"]`,
 six words in all, each a DIFFERENT lever and all true to the clip: (1) the biggest number or sum, (2) a villain
 named, (3) a surprising true fact, (4) what the viewer is missing, (5) a named person + outcome, (6) Kevin
 Trudeau by name, (7) your wildest true one. The factory renders all 7 on their own servers (only the hook
 changes) and posts them as Instagram Trial Reels (shown to non-followers only) once the clip itself has posted;
 48 h later `state/variants.json` holds each one's views and the winner. Read the last winners there before you
-write any hook. `check_plan.py` lints every trial hook like a normal hook. Instagram only; skip it when
+write any hook. Until one experiment has posted all 7 arms, `check_plan.py` allows trial hooks on ONE clip a
+plan (the strongest); after that, on every clip. Every trial hook is linted like a normal hook. Instagram only; skip it when
 Instagram is not connected.
 
 ## What makes a clip worth posting (Kamay's taste, learned from real numbers)
