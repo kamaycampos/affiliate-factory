@@ -11,6 +11,15 @@ on the second-chance backlog, hit the account's usage limit, and pushed nothing.
 each plan passes `check_plan.py`**, to the same branch - the merge job takes each push - so a run that is
 cut off still keeps the plans it finished.
 
+## VIRALITY IS THE JOB: EVERY CLIP IS ONE PEOPLE SEND (3 Nov 2026, Kamay: "make it a rule")
+Read `factory/VIRALITY.md`. Instagram's strongest signal with strangers is **sends per reach** (Mosseri),
+and KT's reach fell 103K -> 19K per 14 days while shares per reel fell 9.4 -> ~3 (skip rate flat). Every
+clip carries `"send"`: one line - who sends it to whom, and why ("a friend sends it to a friend: proof
+of what they argued about"), and the HIGH-AROUSAL emotion it rides: awe, anger (at being
+lied to) or anxiety (losing money / time) - never a calm lesson alone. Prefer the clip with the clearer
+send. `check_plan.py` refuses a clip without it. The trial reels now crown the hook with the most
+sends per reach, not the most views - read the winners in `state/variants.json`.
+
 ## Procedure
 1. `pip install -q opencv-python-headless pillow numpy 2>/dev/null` (so the hook lint can load).
 2. `python factory/routine_prep.py --max 4`. This prints the queue depth, downloads and decrypts the next unplanned episodes' transcripts into `work/`, and writes 30-second reading blocks for each.

@@ -1,7 +1,8 @@
 {
- "version": "1.3.1",
+ "version": "1.4.0",
  "upstream": "kamaycampos/affiliate-factory",
  "changes": [
+  "1.4.0: exact captions available in the shared engine (look 'word'); virality rule - every clip names who SENDS it; trial reels crown sends per reach",
   "1.3.1: trial reels retry a refused post instead of dropping the experiment; posting-limit guard; trial hooks on every clip once proven",
   "Trial Reels: one clip a day gets 7 hooks, posted to Instagram as Trial Reels (non-followers only); the winner is measured after 48 h",
   "The cinema look: film grade, a quiet serif label, calm captions - say 'cinema' when you set your style",
