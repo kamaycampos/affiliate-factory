@@ -32,6 +32,8 @@ jobs:
             # 2 h (the 4-6/day rule), TikTok stats once per heartbeat (~6 h).
             if [ $((i % 6)) -eq 1 ]; then gh workflow run cadence.yml || echo "cadence dispatch failed"; fi
             if [ "$i" -eq 1 ]; then gh workflow run tiktok_stats.yml || echo "stats dispatch failed"; fi
+            # 9 Nov 2026: every copy installs the newest kit version by itself, once per heartbeat.
+            if [ "$i" -eq 1 ]; then gh workflow run kit_update.yml || echo "kit update dispatch failed"; fi
             sleep 1200
           done
       - name: Hand over to the next heartbeat

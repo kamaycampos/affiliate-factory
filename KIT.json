@@ -1,7 +1,9 @@
 {
- "version": "1.4.0",
+ "version": "1.5.0",
  "upstream": "kamaycampos/affiliate-factory",
  "changes": [
+  "1.5.0: your factory updates itself - GitHub checks the original every few hours and every weekly plan checks again; nothing of yours is replaced",
+  "1.5.0: setup one step at a time on a simple page (tick, Next, skips what you already have); GitHub login with nothing to type in the Terminal",
   "1.4.0: exact captions available in the shared engine (look 'word'); virality rule - every clip names who SENDS it; trial reels crown sends per reach",
   "1.3.1: trial reels retry a refused post instead of dropping the experiment; posting-limit guard; trial hooks on every clip once proven",
   "Trial Reels: one clip a day gets 7 hooks, posted to Instagram as Trial Reels (non-followers only); the winner is measured after 48 h",

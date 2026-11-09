@@ -1,0 +1,30 @@
+# EVERY COPY UPDATES ITSELF (9 Nov 2026). A fix pushed to the original kit used to reach a
+# member only when they typed `update`, and nobody does. This job looks for a newer version
+# number in the original's KIT.json and installs it, keeping everything that is the member's
+# own (my_brand/, state/, their plans, their keys). The heartbeat starts it every ~6 hours;
+# the timer below is the spare. A version that changes a workflow file cannot be written by
+# GitHub's own key: that one is installed from the member's computer at the next weekly plan.
+name: kit_update
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "41 9 * * *"
+permissions:
+  contents: write
+concurrency:
+  group: kit-update
+  cancel-in-progress: false
+jobs:
+  update:
+    if: github.repository != 'kamaycampos/affiliate-factory'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install the newest kit version, if there is one
+        run: |
+          git config user.name  "kt-machine"
+          git config user.email "noreply@github.com"
+          python3 kit_update.py --cloud

@@ -41,7 +41,7 @@ That's it. After that, these words run your factory:
 | `post` | Switch on autopilot, one platform at a time |
 | `style` | Change your look: colours, font, capitals, shadow, timing |
 | `teach` | Show it a reel you love, and your next clips learn from it |
-| `update` | Get the newest kit version, and keep everything that's yours |
+| `update` | Check for the newest kit version now. Your factory also updates itself, and keeps everything that's yours |
 | anything else | Ask for a theme week, a series, a new style. It's your studio. |
 
 ## Your control panel

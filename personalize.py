@@ -74,6 +74,8 @@ def main():
     rehash_shared(HERE)
     print(f"Your machine now knows it is {repo} ({changed} files).")
     print()
+    if "--no-keys" in sys.argv:   # kit_update.py on GitHub: the name only, never the keys
+        return
     # THE KEYS ARE NEVER PRINTED (15 Oct 2026, WB rehearsal). They go to a private file
     # on this computer - `plan` needs TRANSCRIPT_KEY to read the transcripts - and
     # straight into GitHub's secrets with `gh`. A key printed into a chat is a leaked key;

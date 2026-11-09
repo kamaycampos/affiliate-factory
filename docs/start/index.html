@@ -3,309 +3,219 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
 <title>Affiliate Factory Setup</title>
-<meta name="description" content="Your 30-minute setup, one picture per step. Your Claude does the work; you log in, click Allow, and choose.">
+<meta name="description" content="Set up your Affiliate Factory one step at a time. Tick each step, click Next.">
 <style>
-:root{--bg:#f6f4ef;--card:#ffffff;--ink:#1b1a17;--soft:#5f5b52;--line:#e4dfd3;--gold:#b8862e;--goldbg:#fbf3e2;--ok:#1f7a4a;--okbg:#e6f4ec;--you:#7a3fd1;--youbg:#f1eafc;--claude:#a8541b;--claudebg:#fbeee4}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#13120f;--card:#1d1c18;--ink:#f3efe6;--soft:#b3ad9f;--line:#33302a;--gold:#e0b45c;--goldbg:#2a2316;--ok:#59c48b;--okbg:#14261c;--you:#b994f2;--youbg:#251d33;--claude:#e8955a;--claudebg:#2c1f15}}
-:root[data-theme="dark"]{--bg:#13120f;--card:#1d1c18;--ink:#f3efe6;--soft:#b3ad9f;--line:#33302a;--gold:#e0b45c;--goldbg:#2a2316;--ok:#59c48b;--okbg:#14261c;--you:#b994f2;--youbg:#251d33;--claude:#e8955a;--claudebg:#2c1f15}
+:root{color-scheme:light only}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-.wrap{max-width:880px;margin:0 auto;padding:28px 16px 80px}
-h1{font-size:clamp(30px,6vw,46px);line-height:1.1;margin:8px 0 10px;letter-spacing:-.02em}
-h2{font-size:26px;margin:0 0 6px}
-.kicker{color:var(--gold);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:13px}
-.lead{font-size:20px;color:var(--soft);margin:0 0 22px}
-.three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 8px}
-.three div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;text-align:center}
-.three b{display:block;font-size:30px}
-.three span{color:var(--soft);font-size:15px}
-.scene{background:var(--goldbg);border:1px solid var(--line);border-radius:20px;padding:22px;margin:26px 0}
-.scene h2{color:var(--gold)}
-.targets{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
-.targets div{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--line)}
-.targets h3{margin:0 0 6px;font-size:19px}
-.targets ul{margin:0;padding-left:20px;color:var(--soft);font-size:16px}
-.loop{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px;font-size:15px}
-.loop span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
-.loop i{color:var(--gold);font-style:normal}
-.step{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;margin:22px 0;box-shadow:0 1px 0 rgba(0,0,0,.03)}
-.top{display:flex;align-items:center;gap:14px;margin-bottom:8px}
-.num{flex:none;width:52px;height:52px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-weight:800;font-size:24px}
-.time{margin-left:auto;color:var(--soft);font-size:15px;white-space:nowrap}
-.who{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
-.who div{border-radius:14px;padding:12px 14px;font-size:16px}
-.you{background:var(--youbg)}.you b{color:var(--you)}
-.cl{background:var(--claudebg)}.cl b{color:var(--claude)}
-.screen{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--bg);margin-top:8px}
-.screen .cap{font-size:13px;color:var(--soft);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
-.ghbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.repo{font-weight:600}
-.btn{display:inline-flex;align-items:center;gap:8px;border-radius:8px;padding:9px 14px;font-weight:600;font-size:15px;border:1px solid transparent}
-.gh{background:#1f883d;color:#fff}
-.ghost{background:var(--card);border-color:var(--line);color:var(--ink)}
-.pulse{outline:3px solid #f5b400;outline-offset:3px;animation:p 1.6s infinite}
-@keyframes p{50%{outline-color:transparent}}
-.arrow{color:#d48a00;font-weight:800}
-.looks{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.looks figure{margin:0;text-align:center}
-.looks img{width:100%;border-radius:12px;display:block;border:1px solid var(--line)}
-.looks figcaption{font-weight:700;margin-top:6px;font-size:16px}
-.looks small{display:block;color:var(--soft);font-weight:400}
-.plats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.plat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;font-size:15px}
-.plat .dot{width:34px;height:34px;border-radius:9px;margin:0 auto 8px}
-.ig{background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)}.fb{background:#1877f2}.yt{background:#ff0000}.tt{background:#111}
-.chip{display:inline-block;margin-top:6px;font-size:13px;border-radius:999px;padding:3px 10px;background:var(--okbg);color:var(--ok);font-weight:700}
-.rule{display:grid;gap:8px;font-size:15px}
-.rule div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
-.rule b{color:var(--soft);font-weight:600;display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
-.dm{display:flex;flex-direction:column;gap:8px;max-width:420px}
-.bub{border-radius:18px;padding:10px 14px;font-size:15px;max-width:85%}
-.them{background:var(--line);align-self:flex-start}
-.me{background:#3797f0;color:#fff;align-self:flex-end}
-.done li{margin:6px 0}
-.ok{color:var(--ok);font-weight:800}
-.note{font-size:15px;color:var(--soft);margin-top:10px}
-.foot{margin-top:40px;color:var(--soft);font-size:14px;text-align:center}
-.parta{background:var(--youbg);border:1px solid var(--line);border-radius:22px;padding:22px;margin:22px 0}
-.parta h2{margin:0 0 4px}.parta .sub{color:var(--soft);font-size:15px;margin:0 0 14px}
-.a{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
-.a h3{margin:0 0 8px;font-size:18px}.a ol{margin:0 0 6px;padding-left:22px}.a li{margin:4px 0}
-.app{border:1px solid var(--line);border-radius:14px;background:var(--bg);overflow:hidden;margin-top:10px}
-.tabs{display:flex;gap:6px;padding:10px;border-bottom:1px solid var(--line)}
-.tabs span{padding:6px 14px;border-radius:999px;font-size:14px;color:var(--soft)}
-.tabs .on{background:var(--ink);color:var(--bg);font-weight:700}
-.pbox{padding:12px}.pbox .msg{border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--soft);font-size:15px;background:var(--card)}
-.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.pills span{font-size:13px;border:1px solid var(--line);border-radius:8px;padding:5px 9px;background:var(--card)}
-.tog{display:inline-flex;align-items:center;gap:10px;font-weight:600}
-.tog i{width:42px;height:24px;border-radius:999px;background:#2fa84f;position:relative;display:inline-block}
-.tog i:after{content:"";position:absolute;right:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff}
-@media (max-width:640px){.three,.targets,.who{grid-template-columns:1fr}.looks{grid-template-columns:repeat(2,1fr)}.plats{grid-template-columns:repeat(2,1fr)}body{font-size:17px}}
+html,body{background:#fff;color:#000}
+body{margin:0;font:20px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:680px;margin:0 auto;padding:20px 16px 60px}
+.brand{font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.bar{height:8px;background:#e6e6e6;border-radius:99px;margin:12px 0 6px;overflow:hidden}
+.bar i{display:block;height:100%;background:#000;width:0;transition:width .25s}
+.count{font-size:15px;color:#444;margin-bottom:22px}
+h1{font-size:32px;line-height:1.15;margin:0 0 6px}
+.time{font-size:15px;color:#444;margin:0 0 18px}
+p{margin:0 0 14px}
+.q{font-size:22px;font-weight:700;margin:6px 0 10px}
+.how{border-left:4px solid #000;padding:4px 0 4px 14px;margin:0 0 18px}
+label.c{display:flex;gap:14px;align-items:flex-start;border:2px solid #000;border-radius:12px;padding:14px;margin:0 0 10px;cursor:pointer}
+label.c input{flex:none;width:26px;height:26px;margin:2px 0 0;accent-color:#000}
+label.c.on{background:#f1f1f1}
+label.c small{display:block;font-size:16px;color:#444;margin-top:4px}
+.opt,.next,.dl{display:block;width:100%;text-align:left;font:inherit;font-weight:700;border:2px solid #000;border-radius:12px;padding:16px;margin:0 0 10px;background:#fff;color:#000;cursor:pointer;text-decoration:none}
+.opt:hover{background:#f1f1f1}
+.next,.dl{background:#000;color:#fff;text-align:center;margin-top:18px}
+.next[disabled]{background:#c9c9c9;border-color:#c9c9c9;cursor:not-allowed}
+.hint{font-size:16px;color:#444;text-align:center;margin-top:8px;min-height:24px}
+.back{font:inherit;font-size:17px;background:none;border:0;padding:8px 0;margin-top:18px;color:#000;text-decoration:underline;cursor:pointer}
+a{color:#000}
+.link{word-break:break-all;font-weight:700}
+.pic{border:2px solid #000;border-radius:12px;margin:6px 0 18px;overflow:hidden}
+.pic .cap{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:#000;color:#fff;padding:6px 12px}
+.pic .in{padding:16px;font-size:16px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pill{border:1.5px solid #000;border-radius:8px;padding:7px 11px;white-space:nowrap}
+.hl{outline:4px solid #f5b400;outline-offset:2px;font-weight:700}
+.dim{color:#777;border-color:#bbb}
+.box{border:1.5px solid #000;border-radius:10px;padding:12px;margin-bottom:10px;color:#444}
+.arrow{font-weight:800;font-size:15px}
+.tog{display:inline-block;width:46px;height:26px;border-radius:99px;background:#000;position:relative;vertical-align:middle;margin-right:10px}
+.tog:after{content:"";position:absolute;right:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff}
+.name{display:inline-flex;gap:8px;align-items:center}
+.av{width:30px;height:30px;border-radius:50%;background:#000;color:#fff;display:inline-grid;place-items:center;font-size:14px;font-weight:700}
+ul.plain{margin:0 0 14px;padding-left:22px}
+ul.plain li{margin:6px 0}
+.done{font-size:54px;line-height:1;margin:0 0 8px}
+@media (max-width:480px){body{font-size:18px}h1{font-size:27px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-
-<div class="kicker">The Affiliate Factory</div>
-<h1>Your clip machine, set up in 30 minutes.</h1>
-<p class="lead">Welcome. Follow steps <b>A1 to A7</b> yourself (about 15 minutes, once). In step <b>A8</b> you hand the setup file to Claude, and Claude takes over. After that you only <b>log in</b>, click <b>Allow</b>, <b>choose</b> your style, and <b>paste</b> a key when Claude asks.</p>
-
-<div class="three">
-  <div><b>30 min</b><span>of your time, once</span></div>
-  <div><b>7 steps</b><span>one picture each</span></div>
-  <div><b>Forever</b><span>it runs by itself after</span></div>
+  <div class="brand">The Affiliate Factory</div>
+  <div class="bar"><i id="bar"></i></div>
+  <div class="count" id="count"></div>
+  <div id="screen"></div>
+  <button class="back" id="back" type="button">&larr; Back</button>
 </div>
 
-<section class="scene" id="ideal">
-  <h2>Where this ends: the ideal scene</h2>
-  <div class="targets">
-    <div>
-      <h3>1 · Everything runs by itself</h3>
-      <ul>
-        <li>Kevin's newest episode is always cut first</li>
-        <li>Best moments chosen weekly, strongest line first</li>
-        <li>HD clips, hook and word-perfect captions</li>
-        <li>Posts itself to Instagram, Facebook, YouTube; TikTok one tap</li>
-        <li>Every keyword comment gets your link by DM</li>
-        <li>Your numbers measured, and the next week gets smarter</li>
-      </ul>
-    </div>
-    <div>
-      <h3>2 · Your style, chosen once</h3>
-      <ul>
-        <li>Tell or show Claude the look you want</li>
-        <li>Pick your voice: teacher, challenger or storyteller</li>
-        <li>Pick your topics: money, real estate, manifesting…</li>
-        <li>Pick the word people comment</li>
-        <li>Change anything later just by saying it</li>
-      </ul>
-    </div>
-  </div>
-  <div class="loop"><span>New Kevin episode</span><i>→</i><span>Best moments chosen</span><i>→</i><span>Your-style clips</span><i>→</i><span>Posted for you</span><i>→</i><span>Comment → DM with your link</span><i>→</i><span>Numbers teach next week</span><i>↺</i></div>
-</section>
+<script>
+/* One step per screen. Tick each line, click Next. Questions skip what you already have.
+   The words here match Part A of THE_AFFILIATE_FACTORY.md - change both together. */
+var FILE_RAW = "https://raw.githubusercontent.com/kamaycampos/affiliate-factory/main/THE_AFFILIATE_FACTORY.md";
+var FILE_NAME = "THE_AFFILIATE_FACTORY.md";
 
-<!-- PART A -->
-<section class="parta" id="partA">
-  <h2>Part A · Get Claude ready</h2>
-  <p class="sub">You do this part yourself, once.</p>
+var PIC = {
+  plan: '<div class="pic"><div class="cap">Where to look: bottom left of claude.ai</div><div class="in"><span class="name"><span class="av">C</span> Your name &middot; <span class="pill hl">Pro</span></span><div style="margin-top:10px">The small word next to your name is your plan: Free, Pro or Max.</div></div></div>',
+  ext: '<div class="pic"><div class="cap">What you will see in Chrome</div><div class="in"><div class="row"><b>Claude</b><span class="pill hl">Add to Chrome</span><span class="arrow">then</span><span class="pill">Add extension</span></div></div></div>',
+  toggle: '<div class="pic"><div class="cap">What you will see in Settings</div><div class="in"><span class="tog"></span><b>Allow bypass permissions mode</b></div></div>',
+  code: '<div class="pic"><div class="cap">The Claude app: where everything is</div><div class="in"><div class="row" style="margin-bottom:12px"><span class="pill dim">Chat</span><span class="pill hl">Code</span><span class="arrow">&larr; click Code, at the top</span></div><div class="box">Type here&hellip; (the chat box)</div><div class="arrow" style="margin-bottom:6px">&darr; underneath the chat box, from left to right</div><div class="row"><span class="pill hl">My computer</span><span class="pill hl">My Factory</span><span class="pill hl">Opus 5.5</span><span class="pill hl">Bypass permissions</span></div></div></div>',
+  start: '<div class="pic"><div class="cap">What it looks like before you press Enter</div><div class="in"><div class="box" style="color:#000"><span class="pill">THE_AFFILIATE_FACTORY.md</span><div style="margin-top:10px"><b>Set me up.</b></div></div><div class="row"><span class="pill">My computer</span><span class="pill">My Factory</span><span class="pill">Opus 5.5</span><span class="pill">Bypass permissions</span></div></div></div>'
+};
 
-  <div class="a"><h3>Before we start: 3 questions</h3>
-    <ol><li><b>I opened the file on my phone.</b> Don't do this on your phone. Open the same chat or email on your computer and save the file there. Everything happens on the computer. (This picture page is the one thing to keep on your phone.)</li>
-    <li><b>How much will this cost?</b> Claude Pro, $20 a month. Nothing else. Every other tool is free.</li>
-    <li><b>I learn better with pictures.</b> You're in the right place: every step is on this page.</li></ol>
-  </div>
+var S = [
+ {id:"welcome", title:"Set up your Affiliate Factory", time:"About 15 minutes here, then about 30 minutes with Claude",
+  html:'<p>One step at a time. Tick each line when it is done, then click <b>Next</b>.</p><p>If you already have something, you skip that step.</p><ul class="plain"><li><b>Use your computer</b>, not your phone. Everything happens on the computer.</li><li><b>Cost:</b> Claude Pro, $20 a month. Nothing else. Every other tool used here is free.</li></ul>',
+  nextLabel:"Start"},
 
-  <div class="a"><h3>What you need before you start</h3>
-    <ol><li>Your Kevin Trudeau affiliate link (from the affiliate portal).</li>
-    <li>The email and password for your Instagram, Facebook, YouTube (your Google account) and TikTok.</li>
-    <li>Your phone, close by. Some sites text you a code.</li>
-    <li>About 45 minutes in total (15 for A1 to A8, then about 30 with Claude), when nobody needs your computer.</li></ol>
-  </div>
+ {id:"need", n:1, title:"What you need before you start",
+  checks:["Your Kevin Trudeau affiliate link (from the affiliate portal).",
+          "The email and password for your Instagram, Facebook, YouTube (your Google account) and TikTok.",
+          "Your phone, close by. Some sites text you a code.",
+          "About 45 minutes in total, at a time when nobody needs your computer."]},
 
-  <div class="a"><h3>A1 · Get Claude Pro <span class="time">3 min</span></h3>
-    <p class="note"><b>Already have Claude?</b> Open <b>claude.ai</b>, log in, and look at the bottom left: right next to your name, in small letters, it shows your plan. <b>Pro</b> or <b>Max</b>: you're done, go to A2. <b>Free</b>: do only step 2.</p>
-    <ol><li>No account yet? Open <b>claude.ai</b> and <b>Sign up</b> (Google or email).</li>
-    <li>Your name (bottom left) → <b>Upgrade plan</b> → <b>Pro</b> → pay with your card.</li></ol>
-    <div class="screen"><div class="cap">What you'll see</div><div class="ghbar"><span class="btn ghost">Free</span><span class="btn gh pulse">Pro · $20/month</span><span class="btn ghost">Max</span><span class="arrow">← this one</span></div></div>
-  </div>
+ {id:"a1", n:2, title:"A1. Get Claude Pro", time:"3 minutes",
+  q:"Do you already have Claude Pro?",
+  html:'<div class="how">How to check: open <b>claude.ai</b> on your computer and log in. Look at the bottom left corner. Right next to your name, in small letters, it shows your plan.</div>'+PIC.plan,
+  opts:[["Yes. It says Pro or Max","a2"],["It says Free","a1free"],["I have no Claude account yet","a1new"]]},
+ {id:"a1free", n:2, title:"A1. Get Claude Pro", time:"1 minute", next:"a2",
+  checks:['Click your name (bottom left), then "Upgrade plan". Choose Pro, $20 a month, and pay with your card.<small>You type your own card details. Claude never asks for them.</small>']},
+ {id:"a1new", n:2, title:"A1. Get Claude Pro", time:"3 minutes", next:"a2",
+  checks:["On your computer, open claude.ai",
+          'Click "Sign up". Use "Continue with Google" or your email, and follow the steps.',
+          'Click your name (bottom left), then "Upgrade plan". Choose Pro, $20 a month, and pay with your card.<small>You type your own card details. Claude never asks for them.</small>']},
 
-  <div class="a"><h3>A2 · Install the Claude app <span class="time">3 min</span></h3>
-    <ol><li>Open <b>claude.ai/download</b> → <b>Download for Mac</b> (or Windows).</li>
-    <li>Mac: open the file, drag <b>Claude</b> into <b>Applications</b>, open it. Windows: run the installer.</li>
-    <li>Sign in with the same account.</li></ol>
-  </div>
+ {id:"a2", n:3, title:"A2. Install the Claude app", time:"3 minutes",
+  q:"Is the Claude app already installed on this computer?",
+  html:'<div class="how">The app is a program on your computer, with its own Claude icon. It is not the claude.ai website. Having Claude Pro does not mean you have the app.</div>',
+  opts:[["Yes. I can open the Claude app","a2yes"],["No, or I am not sure","a2no"]]},
+ {id:"a2yes", n:3, title:"A2. Install the Claude app", next:"a3",
+  checks:["Open the Claude app. Check that it is signed in with the same account as in A1 (your name shows at the bottom left)."]},
+ {id:"a2no", n:3, title:"A2. Install the Claude app", time:"3 minutes", next:"a3",
+  checks:['Open <a href="https://claude.ai/download" target="_blank" rel="noopener">claude.ai/download</a> and click the button for your computer (Mac or Windows).',
+          'Mac: open the downloaded file, drag Claude into Applications, then open Claude from Applications. If the Mac asks "Are you sure you want to open it?", click Open.<small>Windows: open the downloaded file and follow the installer.</small>',
+          "Sign in with the same account as in A1."]},
 
-  <div class="a"><h3>A3 · Chrome + the Claude extension <span class="time">3 min</span></h3>
-    <ol><li>No Chrome? Install it from <b>google.com/chrome</b>.</li>
-    <li>In Chrome, open the <b>Claude</b> extension page (link in your setup file) → <b>Add to Chrome</b> → <b>Add extension</b>.</li>
-    <li>Puzzle piece (top right) → <b>pin</b> Claude. Click the Claude icon → <b>sign in</b> with the same account.</li></ol>
-    <div class="screen"><div class="cap">What you'll see</div><div class="ghbar"><span class="repo">Claude</span><span class="btn gh pulse">Add to Chrome</span><span class="arrow">→</span><span class="btn ghost">Add extension</span></div></div>
-  </div>
+ {id:"a3", n:4, title:"A3. Google Chrome and the Claude extension", time:"3 minutes",
+  q:"Do you already have Google Chrome with the Claude extension in it?",
+  html:'<div class="how">Your Claude works in Chrome, where your accounts are already logged in. The extension shows as a Claude icon at the top right of Chrome (it can hide behind the puzzle piece).</div>',
+  opts:[["Yes. Chrome and the Claude extension","a3yes"],["I have Chrome, but not the extension","a3ext"],["I do not have Chrome","a3chrome"]]},
+ {id:"a3yes", n:4, title:"A3. Google Chrome and the Claude extension", next:"a4",
+  checks:["Click the Claude icon in Chrome. Check that it is signed in with the same Claude account as in A1."]},
+ {id:"a3chrome", n:4, title:"A3. Google Chrome and the Claude extension", time:"2 minutes", next:"a3ext",
+  checks:['Install Google Chrome from <a href="https://www.google.com/chrome/" target="_blank" rel="noopener">google.com/chrome</a>, then open this page again in Chrome.']},
+ {id:"a3ext", n:4, title:"A3. Google Chrome and the Claude extension", time:"3 minutes", next:"a4",
+  html:PIC.ext,
+  checks:['In Chrome, open the <a href="https://chromewebstore.google.com/detail/claude/fcoeoabgfenejglbffodgkkbkcdhcgfn" target="_blank" rel="noopener">Claude extension page</a>.',
+          'Click "Add to Chrome", then "Add extension".',
+          "Click the puzzle piece (top right of Chrome), then click the pin next to Claude, so its icon stays visible.",
+          "Click the Claude icon and sign in with the same Claude account as in A1."]},
 
-  <div class="a"><h3>A4 · Let Claude work without asking every time <span class="time">1 min</span></h3>
-    <ol><li>Claude app → your name (bottom left) → <b>Settings</b> → <b>Claude Code</b>.</li>
-    <li>Turn <b>on</b>: <b>Allow bypass permissions mode</b>.</li></ol>
-    <div class="screen"><div class="cap">What you'll see</div><span class="tog"><i></i>Allow bypass permissions mode</span></div>
-  </div>
+ {id:"a4", n:5, title:"A4. Let your Claude work without stopping to ask", time:"1 minute",
+  html:PIC.toggle,
+  checks:["In the Claude app, click your name (bottom left), then Settings, then Code.",
+          'Turn ON: "Allow bypass permissions mode".<small>This lets your Claude do the setup without asking "may I?" a hundred times. After setup, you can switch the mode back to Auto.</small>']},
 
-  <div class="a"><h3>A5 · A folder for your factory <span class="time">1 min</span></h3>
-    <ol><li>On your Desktop make a new folder called <b>My Factory</b>.</li>
-    <li>Drag the setup file (<b>THE_AFFILIATE_FACTORY</b>) into it.</li></ol>
-  </div>
+ {id:"a5", n:6, title:"A5. Make a folder and download your setup file", time:"1 minute",
+  checks:['On your Desktop, right-click. Mac: choose "New Folder". Windows: choose "New", then "Folder". Name it <b>My Factory</b>.',
+          'Download the setup file with the button below.<small>Already got the file from Kamay? Use that one and tick this line.</small>',
+          "Drag the file (THE_AFFILIATE_FACTORY) from your Downloads into the My Factory folder."],
+  extra:'<a class="dl" id="dl" href="'+FILE_RAW+'" target="_blank" rel="noopener">Download the setup file</a><div class="hint" id="dlhint"></div>'},
 
-  <div class="a"><h3>A6 · Open Claude Code, the right way <span class="time">2 min</span></h3>
-    <ol><li>Click the <b>Code</b> tab at the top (not Chat).</li>
-    <li>Below the message box: <b>Project folder</b> → My Factory · <b>Environment</b> → Local · <b>Model</b> → <b>Opus 5.5</b> · <b>Mode</b> → <b>Bypass permissions</b>.</li></ol>
-    <div class="app"><div class="tabs"><span>Chat</span><span>Cowork</span><span class="on pulse">Code</span></div>
-      <div class="pbox"><div class="msg">Set me up.</div>
-      <div class="pills"><span>📁 My Factory</span><span>Local</span><span class="pulse">Opus 5.5 ▾</span><span class="pulse">Bypass permissions ▾</span><span>➤</span></div></div></div>
-  </div>
+ {id:"a6", n:7, title:"A6. Open Claude Code, the right way", time:"2 minutes",
+  html:PIC.code,
+  checks:["In the Claude app, click the Code tab at the top. It must be Code, not Chat.",
+          'Underneath the chat box at the bottom, make sure the settings say this, from left to right:<small><b>My computer</b><br><b>Folder: My Factory</b> (from step A5)<br><b>Opus 5.5</b><br><b>Mode: Bypass permissions</b></small>',
+          "Leave everything else as it is."]},
 
-  <div class="a"><h3>A7 · Keep your computer awake <span class="time">10 sec</span></h3>
-    <ol><li>Plug in your computer and keep the lid open during setup.</li></ol>
-  </div>
+ {id:"a7", n:8, title:"A7. Keep your computer awake", time:"10 seconds",
+  checks:["Plug the computer in, and do not close the lid during setup. Some steps run for a few minutes."]},
 
-  <div class="a"><h3>A8 · Start <span class="time">10 sec</span></h3>
-    <ol><li><b>Drag the setup file into the message box</b>, type <b>Set me up.</b> and press <b>Enter</b>.</li></ol>
-    <p class="note">From here your Claude leads. When it asks you to paste a key: copy it on the web page, click inside the <b>Terminal</b> tab Claude opened above the chat, press <b>Cmd+V</b> (Windows: Ctrl+V), then <b>Enter</b>. Nothing shows while you paste. That's normal.</p>
-  </div>
-</section>
+ {id:"a8", n:9, title:"A8. Start", time:"10 seconds",
+  html:PIC.start,
+  checks:["Drag the setup file from the My Factory folder into the chat box.",
+          "Type: <b>Set me up.</b>",
+          "Press Enter."], nextLabel:"I pressed Enter"},
 
-<!-- STEP 0 -->
-<section class="step" id="card0">
-  <div class="top"><div class="num">0</div><h2>Ready check</h2><div class="time">3-10 min</div></div>
-  <div class="who">
-    <div class="you"><b>You</b> · If a Mac popup asks to install developer tools, click <b>Install</b>. Sign up or log in to GitHub, and type the 8-letter code Claude shows you.</div>
-    <div class="cl"><b>Claude</b> · Checks the model, the mode and your Chrome, installs the free tools it needs, and connects to GitHub.</div>
-  </div>
-  <div class="screen"><div class="cap">What you'll see</div>
-    <div class="ghbar"><span class="repo">github.com/login/device</span><span class="btn ghost">XXXX-XXXX</span><span class="btn gh pulse">Continue</span><span class="arrow">→ Authorize</span></div>
-  </div>
-  <p class="note">Have ready: your KT affiliate link, and the logins for your Instagram, Facebook, YouTube and TikTok.</p>
-</section>
+ {id:"done", n:10, title:"Your part is done. Claude leads now.",
+  html:'<div class="done">&#10003;</div><p>Go back to the Claude app and follow what Claude says. For about 30 minutes you only do four kinds of things:</p><ul class="plain"><li><b>Log in</b> where Claude asks. You type your own passwords; Claude never sees them.</li><li>Click <b>Allow</b>, <b>Continue</b> or <b>Agree</b> when Claude tells you to.</li><li><b>Choose</b> how your clips look and sound, and what they are about.</li><li><b>Paste a key</b> when Claude asks.</li></ul><p><b>If something gets in the way</b></p><ul class="plain"><li><b>Stuck on a step?</b> Click the "I\'m stuck" button under Claude\'s message, or type what you see in plain words. Claude will find another way.</li><li><b>"Usage limit reached":</b> wait until the time Claude shows, then type: continue. Everything done so far is saved.</li><li><b>A web page stops reacting:</b> bring the Chrome window Claude is working in to the front and leave it there.</li><li><b>A site asks for a code:</b> type it yourself from your phone or email. Never read it out to Claude.</li></ul><p><a href="cards.html">See what Claude does next, in pictures</a></p>',
+  last:true}
+];
 
-<!-- STEP 1 -->
-<section class="step" id="card1">
-  <div class="top"><div class="num">1</div><h2>Your own factory</h2><div class="time">4 min</div></div>
-  <div class="who">
-    <div class="you"><b>You</b> · Log in to GitHub (or sign up with your email). That's it.</div>
-    <div class="cl"><b>Claude</b> · Makes your own copy of the factory, named <code>my-factory</code>.</div>
-  </div>
-  <div class="screen"><div class="cap">What you'll see</div>
-    <div class="ghbar"><span class="repo">kamaycampos / affiliate-factory</span><span class="btn gh pulse">Use this template ▾</span><span class="btn ghost">Code</span></div>
-  </div>
-</section>
+var TOTAL = 10, KEY = "af_setup_v2";
+var st = {at:"welcome", hist:[], ticks:{}};
+try { var saved = JSON.parse(localStorage.getItem(KEY) || "null"); if (saved && saved.at) st = saved; } catch (e) {}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+function find(id){ for (var i = 0; i < S.length; i++) if (S[i].id === id) return i; return -1; }
+var h = (location.hash || "").slice(1).toLowerCase();
+if (h && find(h) >= 0 && h !== st.at) { st.hist.push(st.at); st.at = h; }
 
-<!-- STEP 2 -->
-<section class="step" id="card2">
-  <div class="top"><div class="num">2</div><h2>Keys and your control panel</h2><div class="time">3 min</div></div>
-  <div class="who">
-    <div class="you"><b>You</b> · Nothing. Watch if you like.</div>
-    <div class="cl"><b>Claude</b> · Stores your keys and your affiliate link safely, and switches on your own control panel page.</div>
-  </div>
-  <div class="screen"><div class="cap">What you'll see</div>
-    <div class="ghbar"><span class="btn ghost">Settings</span><span class="arrow">→</span><span class="btn ghost">Secrets and variables</span><span class="arrow">→</span><span class="btn gh">New repository secret</span></div>
-  </div>
-</section>
+function go(id){ st.hist.push(st.at); st.at = id; save(); render(); }
+function nextOf(s){ return s.next || S[find(s.id) + 1].id; }
 
-<!-- STEP 3 -->
-<section class="step" id="card3">
-  <div class="top"><div class="num">3</div><h2>Your style, your way</h2><div class="time">5-10 min</div></div>
-  <div class="who">
-    <div class="you"><b>You</b> · Your clips start plain. Tell Claude, or show it a screenshot or a reel, how you want them to look. Then answer 4 quick questions: voice, topics, comment word, your name.</div>
-    <div class="cl"><b>Claude</b> · Turns your picks into your style, so every clip is made that way from now on.</div>
-  </div>
-  <div class="looks" style="grid-template-columns:minmax(0,260px);justify-content:center">
-    <figure><img src="img/look_clean.jpg" alt="A plain clip: white words, no colour" loading="lazy"><figcaption>Where every clip starts: plain<small>then it becomes yours</small></figcaption></figure>
-  </div>
-  <p class="note">Say it any way you like: "jungle green and gold, like my brand", "calm, no capitals", or drop in a screenshot of a reel you love. Claude shows you a preview before any clip is made. Every real clip places the words around the speaker's face automatically. Change anything later just by saying it ("bigger captions", "no capitals").</p>
-</section>
+function render(){
+  var i = find(st.at); if (i < 0) { st.at = "welcome"; i = 0; }
+  var s = S[i], n = s.n || 0, el = document.getElementById("screen"), out = "";
+  document.getElementById("bar").style.width = Math.round(n / TOTAL * 100) + "%";
+  document.getElementById("count").textContent = n ? (s.last ? "All steps done" : "Step " + n + " of " + (TOTAL - 1)) : "";
+  document.getElementById("back").style.display = st.hist.length ? "" : "none";
+  out += "<h1>" + s.title + "</h1>";
+  if (s.time) out += '<p class="time">' + s.time + "</p>";
+  if (s.q) out += '<p class="q">' + s.q + "</p>";
+  if (s.html) out += s.html;
+  if (s.opts) for (var o = 0; o < s.opts.length; o++) out += '<button type="button" class="opt" data-go="' + s.opts[o][1] + '">' + s.opts[o][0] + "</button>";
+  var t = st.ticks[s.id] || [];
+  if (s.checks) for (var c = 0; c < s.checks.length; c++)
+    out += '<label class="c' + (t[c] ? " on" : "") + '"><input type="checkbox" data-c="' + c + '"' + (t[c] ? " checked" : "") + "><span>" + s.checks[c] + "</span></label>";
+  if (s.extra) out += s.extra;
+  if (!s.opts && !s.last) out += '<button type="button" class="next" id="next">' + (s.nextLabel || "Next") + '</button><div class="hint" id="hint"></div>';
+  el.innerHTML = out;
+  var boxes = el.querySelectorAll("input[data-c]");
+  function ready(){
+    var b = document.getElementById("next"); if (!b) return;
+    var all = true; for (var k = 0; k < boxes.length; k++) if (!boxes[k].checked) all = false;
+    b.disabled = !all;
+    document.getElementById("hint").textContent = all ? "" : (boxes.length > 1 ? "Tick every line to continue." : "Tick the line to continue.");
+  }
+  for (var k = 0; k < boxes.length; k++) boxes[k].addEventListener("change", function(){
+    var arr = st.ticks[s.id] || []; arr[+this.getAttribute("data-c")] = this.checked; st.ticks[s.id] = arr; save();
+    this.parentNode.className = "c" + (this.checked ? " on" : ""); ready();
+  });
+  ready();
+  var os = el.querySelectorAll("[data-go]");
+  for (var m = 0; m < os.length; m++) os[m].addEventListener("click", function(){ go(this.getAttribute("data-go")); });
+  var nb = document.getElementById("next"); if (nb) nb.addEventListener("click", function(){ go(nextOf(s)); });
+  var dl = document.getElementById("dl"); if (dl) dl.addEventListener("click", download);
+  try { history.replaceState(null, "", "#" + s.id); } catch (e) {}
+  window.scrollTo(0, 0);
+}
 
-<!-- STEP 4 -->
-<section class="step" id="card4">
-  <div class="top"><div class="num">4</div><h2>Connect your accounts</h2><div class="time">15 min</div></div>
-  <div class="who">
-    <div class="you"><b>You</b> · Log in and click <b>Allow</b> for Meta (Instagram + Facebook), Google (YouTube) and TikTok. Three times Claude asks you to <b>paste a key</b>: copy it on the page, click inside the <b>Terminal</b> tab, <b>Cmd+V</b>, <b>Enter</b>.</div>
-    <div class="cl"><b>Claude</b> · Builds every connection in your Chrome and switches autopost on.</div>
-  </div>
-  <div class="screen"><div class="cap">What you'll see</div>
-    <div class="plats">
-      <div class="plat"><div class="dot ig"></div>Instagram<br><span class="chip">automatic</span></div>
-      <div class="plat"><div class="dot fb"></div>Facebook<br><span class="chip">automatic</span></div>
-      <div class="plat"><div class="dot yt"></div>YouTube<br><span class="chip">automatic</span></div>
-      <div class="plat"><div class="dot tt"></div>TikTok<br><span class="chip" style="background:var(--line);color:var(--soft)">lands in your inbox, 1 tap</span></div>
-    </div>
-    <p class="note">All free. Your only cost is Claude Pro. You click <b>Continue</b> or <b>Allow</b> on each screen; Claude does the rest.</p>
-  </div>
-</section>
+/* The file is read from the kit itself, so the download is always the newest version. */
+function download(ev){
+  if (!window.fetch || !window.Blob) return;
+  ev.preventDefault();
+  var hint = document.getElementById("dlhint"); hint.textContent = "Downloading...";
+  fetch(FILE_RAW, {cache:"no-store"}).then(function(r){ if (!r.ok) throw 0; return r.blob(); }).then(function(b){
+    var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([b], {type:"application/octet-stream"}));
+    a.download = FILE_NAME; document.body.appendChild(a); a.click(); a.remove();
+    hint.textContent = "Downloaded. Look in your Downloads folder for THE_AFFILIATE_FACTORY.";
+  }).catch(function(){ hint.textContent = ""; window.open(FILE_RAW, "_blank"); });
+}
 
-<!-- STEP 5 -->
-<section class="step" id="card5">
-  <div class="top"><div class="num">5</div><h2>Your link, sent automatically</h2><div class="time">5 min</div></div>
-  <div class="who">
-    <div class="you"><b>You</b> · Comment your word from a second account to test it. Watch the DM arrive.</div>
-    <div class="cl"><b>Claude</b> · Builds the "comment → DM" rule in your Meta inbox, then proves it works with you.</div>
-  </div>
-  <div class="screen"><div class="cap">The rule Claude builds</div>
-    <div class="rule">
-      <div><b>When someone comments</b>MONEY · money</div>
-      <div><b>Reply in public</b>Just sent it to you - check your messages</div>
-      <div><b>Send privately</b>Here it is: your link · #ad</div>
-    </div>
-  </div>
-  <div class="screen"><div class="cap">What your viewer gets</div>
-    <div class="dm"><div class="bub them">MONEY</div><div class="bub me">Here it is: your-link.com 🎁<br>#ad, I earn a commission if you buy through my link.</div></div>
-  </div>
-</section>
-
-<!-- STEP 6 -->
-<section class="step" id="card6">
-  <div class="top"><div class="num">6</div><h2>Switch it on</h2><div class="time">2 min</div></div>
-  <div class="who">
-    <div class="you"><b>You</b> · Nothing.</div>
-    <div class="cl"><b>Claude</b> · Starts your first batch and the posting heartbeat, and sets a weekly Monday task in your Claude app that chooses your clips forever (it runs while your computer is on).</div>
-  </div>
-  <div class="screen"><div class="cap">What you'll see</div>
-    <div class="ghbar"><span class="btn ghost">Actions</span><span class="arrow">→</span><span class="btn ghost">factory</span><span class="arrow">→</span><span class="btn gh pulse">Run workflow</span></div>
-  </div>
-</section>
-
-<!-- STEP 7 -->
-<section class="step" id="card7">
-  <div class="top"><div class="num">7</div><h2>Done: your control panel</h2><div class="time">1 min</div></div>
-  <ul class="done">
-    <li><span class="ok">✓</span> Your factory exists, and your panel opens</li>
-    <li><span class="ok">✓</span> Your style, voice, topics and word are saved</li>
-    <li><span class="ok">✓</span> Instagram, Facebook, YouTube post by themselves; TikTok clips land in your TikTok inbox, ready to tap Post</li>
-    <li><span class="ok">✓</span> Comment → DM tested: the DM arrived</li>
-    <li><span class="ok">✓</span> First clips arrive in 1–3 hours; new ones every week</li>
-  </ul>
-  <p class="note">Bookmark your panel. Want a change? Just tell your Claude in plain words: "more real estate", "yellow captions", "post 3 a day".</p>
-</section>
-
-<p class="foot">Built and proven on a live account first: 214,805 views on one reel · 6 posts a day across four platforms · no servers.</p>
-</div>
+document.getElementById("back").addEventListener("click", function(){ if (st.hist.length) { st.at = st.hist.pop(); save(); render(); } });
+render();
+</script>
 </body>
 </html>

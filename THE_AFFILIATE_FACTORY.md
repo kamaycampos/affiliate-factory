@@ -13,8 +13,8 @@ BEFORE WE START: 3 QUESTIONS
 2. How much will this cost?
    Answer: Claude Pro, $20 a month. Nothing else. Every other tool used here is free.
 
-3. What if I learn better with pictures?
-   Answer: See every step with pictures on this page. Open it on your phone and keep it next to you:
+3. What if I want one step at a time, with pictures?
+   Answer: This page shows the same steps one at a time. You tick each step, click Next, and it skips what you already have:
 
    https://kamaycampos.github.io/affiliate-factory/start/
 
@@ -31,7 +31,7 @@ A1. GET CLAUDE PRO (3 minutes)
 
 Do you already have Claude Pro?
 Open claude.ai on your computer and log in. Look at the bottom left corner. Right next to your name, in small letters, it shows your plan.
-- It says "Pro" or "Max": you already have it. Go straight to A2.
+- It says "Pro" or "Max": you already have Claude Pro. Go to A2.
 - It says "Free": do only step 3 below.
 - You have no Claude account yet: do steps 1, 2 and 3 below.
 
@@ -45,6 +45,11 @@ Use this same Claude account in every step that follows.
 
 A2. INSTALL THE CLAUDE APP (3 minutes)
 
+Is the Claude app already installed on this computer?
+The app is a program on your computer, with its own Claude icon. It is not the claude.ai website. Having Claude Pro does not mean you have the app.
+- Yes: open it, check that it is signed in with the same account as in A1, and go to A3.
+- No, or not sure: do steps 1, 2 and 3 below.
+
 1. Open claude.ai/download and click the button for your computer (Mac or Windows).
 2. Mac: open the downloaded file, drag Claude into Applications, then open Claude from Applications. If the Mac asks "Are you sure you want to open it?", click Open.
    Windows: open the downloaded file and follow the installer.
@@ -53,7 +58,13 @@ A2. INSTALL THE CLAUDE APP (3 minutes)
 
 A3. INSTALL GOOGLE CHROME AND THE CLAUDE EXTENSION (3 minutes)
 
-1. No Google Chrome yet? Install it from google.com/chrome. Your Claude works in Chrome, where your accounts are already logged in.
+Do you already have Google Chrome with the Claude extension in it?
+Your Claude works in Chrome, where your accounts are already logged in. The extension shows as a Claude icon at the top right of Chrome (it can hide behind the puzzle piece).
+- Yes, both: click the Claude icon, check that it is signed in with the same account as in A1, and go to A4.
+- You have Chrome, but not the extension: do steps 2 to 5 below.
+- You don't have Chrome: do all the steps below.
+
+1. No Google Chrome yet? Install it from google.com/chrome.
 2. In Chrome, open this address:
 
    https://chromewebstore.google.com/detail/claude/fcoeoabgfenejglbffodgkkbkcdhcgfn
@@ -65,7 +76,7 @@ A3. INSTALL GOOGLE CHROME AND THE CLAUDE EXTENSION (3 minutes)
 
 A4. LET YOUR CLAUDE WORK WITHOUT STOPPING TO ASK (1 minute)
 
-1. In the Claude app, click your name (bottom left), then Settings, then Claude Code.
+1. In the Claude app, click your name (bottom left), then Settings, then Code.
 2. Turn ON: "Allow bypass permissions mode".
    This lets your Claude do the setup without asking "may I?" a hundred times. After setup, you can switch the mode back to Auto (see A6).
 
@@ -78,13 +89,17 @@ A5. MAKE A FOLDER FOR YOUR FACTORY (1 minute)
 
 A6. OPEN CLAUDE CODE, THE RIGHT WAY (2 minutes)
 
-1. In the Claude app, click the Code tab at the top (the tabs are Chat, Cowork, Code). It must be Code, not Chat.
-2. Below the message box, set these four things:
-   Project folder: choose the My Factory folder from A5
-   Environment: Local
-   Model (the menu next to the send button): Opus 5.5
-   Mode (the other menu next to the send button): Bypass permissions
+1. In the Claude app, click the Code tab at the top. It must be Code, not Chat.
+2. Underneath the chat box at the bottom, make sure the settings say this, from left to right:
+   My computer
+   Folder: My Factory (from step A5)
+   Opus 5.5
+   Mode: Bypass permissions
 3. Leave everything else as it is.
+
+See a picture of where these are:
+
+   https://kamaycampos.github.io/affiliate-factory/start/#a6
 
 
 A7. KEEP YOUR COMPUTER AWAKE (10 seconds)
@@ -94,7 +109,7 @@ Plug the computer in, and don't close the lid during setup. Some steps run for a
 
 A8. START (10 seconds)
 
-Drag this file into the message box, type: Set me up.
+Drag this file into the chat box, type: Set me up.
 Then press Enter.
 
 From here on, Claude leads. For about 30 minutes you only do four kinds of things:
@@ -110,6 +125,7 @@ IF SOMETHING GETS IN THE WAY
 - A web page stops reacting: bring the Chrome window Claude is working in to the front and leave it there. Hidden windows freeze.
 - Claude can't reach Chrome: click the Claude icon in Chrome. If it says Connect, click it. Make sure it is signed in to the same Claude account.
 - A site asks for a code: type it yourself from your phone or email. Never read it out to Claude.
+- Stuck on a step? Click the "I'm stuck" button under Claude's message. Claude will find another way.
 - Lost or unsure? Type what you see in plain words, for example: I see a blue button that says Continue. Claude will tell you exactly what to click.
 
 
@@ -120,6 +136,8 @@ Everything below is written for Claude, not for you. Claude reads it when you dr
 
 ## FOR CLAUDE: read all of this before your first message to the member
 (Part A above is written as plain text on purpose: members open this file in plain-text viewers and it may be machine-translated. Keep it free of markdown marks.)
+
+**Setup file version: 1.5.0.** The member may hold an old copy of this file. Before your first message, read the newest one: `curl -fsSL https://raw.githubusercontent.com/kamaycampos/affiliate-factory/main/THE_AFFILIATE_FACTORY.md`. If its version is higher than this one, follow that copy's FOR CLAUDE part instead of this one. If it cannot be read, carry on with this copy.
 
 You are setting up **The Affiliate Factory** for a Kevin Trudeau affiliate. Assume they are **not technical, possibly older, and easily overwhelmed**. They will judge the whole product by how these 30 minutes *feel*. If they feel lost even once, the product failed. Your tone: warm, calm and brief, one thing at a time.
 
@@ -164,9 +182,11 @@ Check each one yourself before you say "done". Don't take a tool's word for it: 
 ---
 
 ## 2. HOW YOU WORK WITH THEM (non-negotiable)
-1. **Show, don't tell.** Before every step, open the visual guide card for that step: https://kamaycampos.github.io/affiliate-factory/start/ . Or take a screenshot of the exact screen and say where to click ("the green button, top right"). Never send them to read a document.
+1. **Show, don't tell.** Before every step, open the visual guide card for that step: https://kamaycampos.github.io/affiliate-factory/start/cards.html . Or take a screenshot of the exact screen and say where to click. Never send them to read a document.
+   **Name a button by the words written on it. Give its colour or its place on the page only when you are looking at it right now** in a screenshot or page read taken in this step. Websites redesign: on 7 Nov 2026 the first member was told "the black button at the top right" for GitHub's Sign up, and what she saw was a big green button in the middle. From memory, say only "the button that says Sign up".
 2. **One step per message.** Say what's about to happen in one sentence, do it, and confirm it worked in one sentence. Show a progress bar like `Step 3 of 7 ▓▓▓░░░░`.
-3. **They only do four kinds of things:** log in (they type their own passwords; **you never type a password, code or card number**), click **Allow / Continue / Agree**, choose, and paste a key into a Terminal tab you opened. Everything else is yours. Every time they act, say **which window, which tab, which button, where on the screen** ("Chrome, the tab called *TikTok for Developers*, the small ⌄ arrow to the right of *Client secret*"). Never say "paste the script" or "run the box": say "click inside the Terminal tab called *X* above the chat, press Cmd+V, then Enter".
+3. **They only do four kinds of things:** log in (they type their own passwords; **you never type a password, code or card number**), click **Allow / Continue / Agree**, choose, and paste a key into a Terminal tab you opened. Everything else is yours. Every time they act, say **which window, which tab, which button, where on the screen** ("Chrome, the tab called *TikTok for Developers*, the small ⌄ arrow to the right of *Client secret*"). Never say "paste the script" or "run the box": say "click inside the Terminal tab called *X*, press Cmd+V, then Enter", and say where that tab is from what you see on their screen now (the Terminal panel can sit above the chat or on the right).
+   **If they say nothing happens in the Terminal tab** (7 Nov 2026: the first member pressed Enter there and nothing happened): ask them once to click in the middle of the tab's black area, not on its name, and press the key again. If it still does nothing, do not make them try a third time: do that step another way yourself, or close that tab and open a fresh one. Never ask for a key press in the Terminal that you can avoid; the three key pastes are the only ones this setup needs.
 4. **You drive their Chrome** with Claude in Chrome (never the app's built-in Browser pane: it has none of their logins). Ask once at the start: *"May I use your Chrome to set everything up? You'll approve each log-in."* It's the difference between 30 minutes and 3 hours. If they have two Chrome windows or profiles, pick the one logged in to the account each step needs, and tell them which one you are in.
 5. **No key, token or password ever passes through the chat, and you never type one.** Every key goes in through a **paste prompt in their Terminal panel** that you open for them (`meta_key.py`, `yt_key.py`, `tiktok_key.py` in their repo): they copy the key from the website, click into the Terminal tab, paste, press Enter. The script stores it in GitHub and prints only the account name it reached. Tell them exactly: *"Click the ⌄ / copy icon next to X, then click inside the Terminal tab called Y, Cmd+V, Enter. Nothing shows while you paste."*
 6. **Keep the Chrome window you are driving in front.** A Chrome window hidden behind others stops responding to clicks (Google Cloud forms freeze). If a page stops reacting, ask them to bring that window to the front and leave it there.
@@ -182,14 +202,14 @@ Check each one yourself before you say "done". Don't take a tool's word for it: 
 
 ### Step 0: Ready check (3-10 min) · *Card 0*
 Greet them in two lines, show the progress bar, then check each item yourself and fix what's missing. Tell them the result of each check in a few words.
-1. **Model and mode.** You should be running **Opus 5.5** in **Bypass permissions** mode (Part A, step A6). If not, tell them exactly: *"Below the message box, next to the send button: click the model name → Opus 5.5. Click the mode → Bypass permissions."* If **Bypass permissions** is missing from that menu: *"Click your name bottom-left → Settings → Claude Code → turn on Allow bypass permissions mode."*
+1. **Model and mode.** You should be running **Opus 5.5** in **Bypass permissions** mode (Part A, step A6). If not, tell them exactly: *"Underneath the chat box: click the model name → Opus 5.5. Click the mode → Bypass permissions."* If **Bypass permissions** is missing from that menu: *"Click your name bottom-left → Settings → Code → turn on Allow bypass permissions mode."*
 2. **Claude in Chrome connected.** List the connected browsers. None? Ask them to click the **Claude icon** in Chrome (top right; if hidden: puzzle piece → Claude) and press **Connect**, signed in with the same Claude account. If the extension isn't installed, send them the link from Part A3.
 3. **Free tools on the computer.** Run `git --version` and `python3 --version`.
    - **Mac:** if a popup appears saying the command needs developer tools, `[Them]` click **Install** and **Agree** (5-10 minutes; keep going with Step 3's questions while it installs).
    - **Windows:** `winget install --silent Git.Git Python.Python.3.12`, then reopen the Terminal tab.
 4. **GitHub's tool `gh`.** Run `gh --version`. Missing? **Mac:** download the newest `gh_*_macOS_universal.zip` from github.com/cli/cli/releases (newest release, *Assets*), unzip into `~/bin`, add `~/bin` to PATH in `~/.zshrc`. **Windows:** `winget install --silent GitHub.cli`.
-5. **GitHub account.** Open github.com in their Chrome. No account? `[Them]` **Sign up** with their email and a password they choose; they type the emailed code. You fill in everything else (username = their name or brand, lowercase, no spaces).
-6. **Log `gh` in.** Open a Terminal tab running `gh auth login --web --git-protocol https`. It shows an 8-character code and opens github.com/login/device. `[Them]` type the code shown in the Terminal tab, click **Continue → Authorize github**. Confirm with `gh auth status`.
+5. **GitHub account.** Open github.com in their Chrome. No account? `[Them]` click the button that says **Sign up** (do not describe its colour or place unless you are looking at it), with their email and a password they choose; they type the emailed code. You fill in everything else (username = their name or brand, lowercase, no spaces).
+6. **Log `gh` in, with nothing for them to do in the Terminal.** Run it yourself in the background with the keyboard closed, so it asks no question and waits for no Enter: `gh auth login --web --git-protocol https --hostname github.com --scopes workflow < /dev/null > .gh_login.txt 2>&1 &`. Read `.gh_login.txt`: it holds a one-time code like `ABCD-1234`. Open **https://github.com/login/device** in their Chrome yourself. Tell them the code in the chat (this one-time code is the only code that ever appears in the chat). `[Them]` type the code on that page, then click the buttons that say **Continue** and **Authorize github**. Then run `gh auth status` (it must show their GitHub name) and `gh auth setup-git`, and delete `.gh_login.txt`. Never open a Terminal tab for this step. The `workflow` scope is asked for here so that no later push stops for a second approval.
 
 ### Step 1: Their own factory (2 min) · *Card 1*
 - `[You]` In the Terminal: `gh repo create my-factory --template kamaycampos/affiliate-factory --public --clone` (inside the **My Factory** folder from Part A). **Public** keeps it free, and their videos and transcripts are stored encrypted.
@@ -276,7 +296,7 @@ Then `[You]` set the repository **variable** `AUTOPOST` = `on`, and the secret `
 | `style` | Change the look by talking ("bigger captions", "no capitals") |
 | `teach` | They show a reel they love; the next clips learn from it |
 | `money` | Read their affiliate portal with them and update their numbers |
-| `update` | Get the newest version of the factory, keeping everything that's theirs |
+| `update` | Check for the newest version of the factory now (`python3 kit_update.py`). It also installs itself: GitHub checks every few hours and every weekly plan checks again, keeping everything that's theirs |
 
 ## 6. IF SOMETHING BLOCKS
 - **A platform refuses a login or asks for a phone code:** they enter it; you wait. Never ask them to read you a code.
