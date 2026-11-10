@@ -17,5 +17,6 @@
   "Saves cannot be lost: a factory run that fails to push its clips now fails out loud instead of showing success",
   "Faster, safer builds: trial hooks render on their own servers; the board's 'copied' ticks survive rebuilds",
   "Newest caption engine and edge checks (shared with the live accounts, 2 Nov)"
- ]
+ ],
+ "old_workflows_ok": "1.5.1"
 }

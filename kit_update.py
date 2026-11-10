@@ -14,7 +14,10 @@ This file is the ONE way a copy is updated. It runs in two places:
                                   one waits for the computer run; every other version is
                                   installed here, with nobody at the keyboard.
 
-A new version is announced by the number in the original's KIT.json. What is the
+A new version is announced by the number in the original's KIT.json. When that version's
+other files also work with the OLD workflow files, the kit says so ("old_workflows_ok": the
+same version number) and GitHub installs everything else at once; the workflow files follow
+from the computer. Without that line, a version that changes a workflow waits whole. What is the
 member's own is never replaced (MINE below). Their keys are never touched.
 """
 import json
@@ -78,7 +81,21 @@ def main():
     git("fetch", "-q", "--no-tags", f"https://github.com/{upstream}.git", "main")
     new_sha = git("rev-parse", "FETCH_HEAD").stdout.strip()
     new_kit = json.loads(git("show", f"{new_sha}:KIT.json").stdout)
-    if ver(new_kit["version"]) <= ver(kit["version"]):
+    owner, name = repo.split("/", 1)
+    pages = f"{owner.lower()}.github.io/{name}"
+    files = [f for f in git("ls-tree", "-r", "--name-only", new_sha).stdout.splitlines() if f and not MINE.match(f)]
+    behind = ver(new_kit["version"]) > ver(kit["version"])
+    same = ver(new_kit["version"]) == ver(kit["version"])
+    # Workflow files that are not the original's (with the member's repo name written in).
+    stale = []
+    for f in [x for x in files if x.startswith(WORKFLOWS)]:
+        want = git("show", f"{new_sha}:{f}", text=False).stdout.replace(P_PAGES.encode(), pages.encode()).replace(P_REPO.encode(), repo.encode())
+        p = os.path.join(HERE, f)
+        if not os.path.exists(p) or open(p, "rb").read() != want:
+            stale.append(f)
+    # On the member's computer a copy on the newest NUMBER but with older workflow files is still
+    # finished off: GitHub installed the rest of that version and could not write these.
+    if not behind and (CLOUD or not same or not stale):
         say(f"Already on the newest version ({kit['version']}).")
         return
 
@@ -91,22 +108,16 @@ def main():
             args = [a for a in sys.argv[1:] if a not in ("--root",) and a != HERE]
             sys.exit(subprocess.run([sys.executable, tmp, "--fresh", "--root", HERE, *args]).returncode)
 
-    owner, name = repo.split("/", 1)
-    pages = f"{owner.lower()}.github.io/{name}"
-    files = [f for f in git("ls-tree", "-r", "--name-only", new_sha).stdout.splitlines() if f and not MINE.match(f)]
-
+    later = ""
     if CLOUD:
-        changed = []
-        for f in [x for x in files if x.startswith(WORKFLOWS)]:
-            want = git("show", f"{new_sha}:{f}", text=False).stdout.replace(P_PAGES.encode(), pages.encode()).replace(P_REPO.encode(), repo.encode())
-            p = os.path.join(HERE, f)
-            if not os.path.exists(p) or open(p, "rb").read() != want:
-                changed.append(f)
-        if changed:
-            say(f"Version {new_kit['version']} changes {len(changed)} workflow file(s) ({', '.join(os.path.basename(c) for c in changed)}). "
-                "GitHub's own key may not write those, so this version is installed from the member's computer, "
-                "at the next weekly plan or the next time they open Claude and type: update")
+        if stale and new_kit.get("old_workflows_ok") != new_kit["version"]:
+            say(f"Version {new_kit['version']} changes {len(stale)} workflow file(s) ({', '.join(os.path.basename(c) for c in stale)}) "
+                "and needs them. GitHub's own key may not write those, so this version is installed from the member's "
+                "computer, at the next weekly plan or the next time they open Claude and type: update")
             return
+        if stale:
+            later = (f" {len(stale)} workflow file(s) ({', '.join(os.path.basename(c) for c in stale)}) follow from the "
+                     "member's computer at the next weekly plan; this version works without them.")
         files = [f for f in files if not f.startswith(WORKFLOWS)]
 
     for i in range(0, len(files), 200):
@@ -122,7 +133,7 @@ def main():
     if git("diff", "--staged", "--quiet", check=False).returncode == 0:
         say(f"Already on the newest version ({new_kit['version']}).")
         return
-    git("commit", "-q", "-m", f"update to {new_kit['version']}")
+    git("commit", "-q", "-m", f"update to {new_kit['version']}" + ("" if behind else " (workflow files)"))
 
     ok = False
     why = ""
@@ -147,7 +158,10 @@ def main():
 
     old = set(kit.get("changes", []))
     fresh = [c for c in new_kit.get("changes", []) if c not in old]
-    say(f"UPDATED: {kit['version']} -> {new_kit['version']}. Everything that is the member's own was kept.")
+    if not behind:
+        say(f"UPDATED: version {new_kit['version']} is now complete ({len(stale)} workflow file(s) installed).")
+        return
+    say(f"UPDATED: {kit['version']} -> {new_kit['version']}. Everything that is the member's own was kept." + later)
     for c in fresh[:8]:
         say(f"  new: {c}")
 
