@@ -250,7 +250,7 @@ def board(cs):
     p = ["<meta charset=utf-8><meta name=viewport "
          "content='width=device-width,initial-scale=1'><title>Captions</title>",
          f"<style>{css}</style>", "<h1>Captions</h1>",
-         "<div></div>",
+         "<div><a href='./' style='color:#f5c542'>&larr; Back to My Factory</a></div>",
          "<div><a href='descriptions.html' style='color:#f5c542'>"
          "All descriptions &rarr;</a></div>",
          f"<h2>READY TO POST ON TIKTOK &middot; {len(todo)}</h2>"]
@@ -321,7 +321,7 @@ def archive(cs):
            "pre{white-space:pre-wrap;margin:6px 0 0;font:14px/1.55 inherit}"
            "button{margin-top:9px;padding:8px 15px;border-radius:8px;border:0;"
            "background:#f5c542;color:#111;font-weight:700}a{color:#f5c542}</style>",
-           "<h1>All descriptions</h1><div><a href='./'>&larr; back to what is ready</a></div>",
+           "<h1>All descriptions</h1><div><a href='captions.html'>&larr; back to what is ready</a></div>",
            "<input id=q placeholder='search a word from the clip, the hook or the text' "
            "oninput=\"const v=this.value.toLowerCase();document.querySelectorAll('.c')"
            ".forEach(e=>{e.hidden=v&&!e.textContent.toLowerCase().includes(v)})\">"]

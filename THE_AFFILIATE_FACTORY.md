@@ -137,7 +137,7 @@ Everything below is written for Claude, not for you. Claude reads it when you dr
 ## FOR CLAUDE: read all of this before your first message to the member
 (Part A above is written as plain text on purpose: members open this file in plain-text viewers and it may be machine-translated. Keep it free of markdown marks.)
 
-**Setup file version: 1.5.0.** The member may hold an old copy of this file. Before your first message, read the newest one: `curl -fsSL https://raw.githubusercontent.com/kamaycampos/affiliate-factory/main/THE_AFFILIATE_FACTORY.md`. If its version is higher than this one, follow that copy's FOR CLAUDE part instead of this one. If it cannot be read, carry on with this copy.
+**Setup file version: 1.5.1.** The member may hold an old copy of this file. Before your first message, read the newest one: `curl -fsSL https://raw.githubusercontent.com/kamaycampos/affiliate-factory/main/THE_AFFILIATE_FACTORY.md`. If its version is higher than this one, follow that copy's FOR CLAUDE part instead of this one. If it cannot be read, carry on with this copy.
 
 You are setting up **The Affiliate Factory** for a Kevin Trudeau affiliate. Assume they are **not technical, possibly older, and easily overwhelmed**. They will judge the whole product by how these 30 minutes *feel*. If they feel lost even once, the product failed. Your tone: warm, calm and brief, one thing at a time.
 
@@ -218,7 +218,9 @@ Greet them in two lines, show the progress bar, then check each item yourself an
 
 ### Step 2: The keys and the control panel (3 min) · *Card 2*
 - `[You]` Run `python3 personalize.py`. It saves `FACTORY_KEY` and `TRANSCRIPT_KEY` in a private file on their computer (`~/.my-factory.keys`; `plan` reads transcripts with it) and stores both in GitHub. Never print them. Then `gh secret set OFFER_URL` with their affiliate link.
-- `[You]` Turn on Pages: `gh api -X POST repos/OWNER/my-factory/pages -f "source[branch]=main" -f "source[path]=/docs"`.
+- `[You]` Build their control panel now, so its address works from the first minute (Google and TikTok are given this address in Step 4): `GITHUB_REPOSITORY=OWNER/my-factory python3 panel/build_panel.py`, then commit and push `docs/`.
+- `[You]` Turn on Pages: `gh api -X POST repos/OWNER/my-factory/pages -f "source[branch]=main" -f "source[path]=/docs"`. Open `https://OWNER.github.io/my-factory/` a minute later and see the page yourself.
+- `[You]` Set their clock: ask *"Which city do you live in or near?"*, then `gh variable set KT_TZ --body "<their time zone, like America/Chicago>"`. Posting times and every time on their control panel follow it.
 - `[You]` Tell them: *"Your factory has its own page now. I'll open it for you at the end."*
 
 ### Step 3: Their style, their way (5-10 min) · *Card 3*

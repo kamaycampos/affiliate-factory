@@ -19,6 +19,7 @@
   --bg:#121216; --surface:#1b1b21; --ink:#f1f0ec; --muted:#a3a2ab; --line:#2e2e36;
   --accent:#ffd400; --good:#4cc38a; --warn:#f0b43c; --bad:#ff6b5e; --chip:#26262e; color-scheme:dark}}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
 body{font:16px/1.55 var(--body);padding-inline:16px;padding-block:0 60px}
 .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:28px}
@@ -74,6 +75,17 @@ pre{white-space:pre-wrap;font:13px/1.5 var(--mono);background:var(--surface);bor
 .empty{border:1.5px dashed var(--line);padding:24px;display:grid;gap:8px;color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);
   padding:10px 16px;border-radius:6px;font:700 13px var(--display);text-transform:uppercase}
+.needs{display:grid;gap:10px}
+.need{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--warn);padding:14px;display:grid;gap:8px}
+.need.bad{border-left-color:var(--bad)} .need.ok{border-left-color:var(--good)}
+.need p{margin:0}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:9;background:var(--surface);border-top:3px solid var(--accent);
+  padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));box-shadow:0 -8px 30px rgba(0,0,0,.25)}
+.sheet .in{max-width:640px;margin:0 auto;display:grid;gap:10px}
+.sheet pre{max-height:140px;user-select:all}
+.sheet ol{margin:0;padding-left:20px}
+#newer{border-color:var(--accent);color:var(--accent);padding:6px 10px}
+@media (max-width:760px){nav{flex-wrap:wrap;overflow:visible}header.top{position:static}}
 @media (prefers-reduced-motion:no-preference){.card{transition:transform .15s}.card:hover{transform:translateY(-2px)}}
 </style>
 </head>
@@ -82,43 +94,122 @@ pre{white-space:pre-wrap;font:13px/1.5 var(--mono);background:var(--surface);bor
   <header class="top">
     <div class="toprow">
       <h1>My <span class="gold">Factory</span></h1>
-      <span class="label live"><span class="dot" id="dot"></span><span id="fresh"></span></span>
+      <span class="label live"><span class="dot" id="dot"></span><span id="fresh"></span><button id="newer" hidden>New numbers · refresh</button></span>
     </div>
     <nav role="tablist" id="tabs"></nav>
   </header>
   <main id="room"></main>
 </div>
 <div class="toast" id="toast" hidden></div>
+<div class="sheet" id="sheet" hidden role="dialog" aria-label="Tell Claude"><div class="in">
+  <h3 id="sh_t"></h3>
+  <ol class="small"><li>Open the <b>Claude app</b> on your computer.</li><li>Click your <b>My Factory</b> chat on the left.</li><li>Paste (<b>Cmd+V</b>, on Windows <b>Ctrl+V</b>)<span id="sh_add"></span> and press <b>Enter</b>.</li></ol>
+  <pre id="sh_x"></pre>
+  <div class="row"><button id="sh_again">Copy again</button><button class="btn primary" id="sh_close">Done</button></div>
+</div></div>
 <script id="data" type="application/json">__DATA__</script>
 <script>
 const D = JSON.parse(document.getElementById('data').textContent);
 const R = D.repo, GH = 'https://github.com/' + R;
+const builtAt = new Date(D.built.replace('Z', ':00Z'));
 const edit = p => `${GH}/edit/main/${p}`;
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = n => n == null ? '–' : Number(n).toLocaleString();
-const when = t => t ? new Date(t.replace(' ', 'T')).toLocaleString([], {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) : '';
+// TIMES ARE THE FACTORY'S OWN CLOCK (9 Nov 2026). "scheduled_at" is a wall time in the factory's
+// time zone (D.tz), not in the visitor's: a member in California saw New York times read as local.
+// They are shown exactly as written, and "late" is measured against now on that same clock.
+const TZ = D.tz || 'America/New_York';
+const wall = t => { const m = /^(\d{4})-(\d\d)-(\d\d)[T ](\d\d):(\d\d)/.exec(t || ''); return m ? new Date(Date.UTC(+m[1], m[2]-1, +m[3], +m[4], +m[5])) : null; };
+const when = t => { const d = wall(t); return d ? d.toLocaleString([], {timeZone:'UTC', month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) : ''; };
+function nowWall() {
+  try { const p = new Intl.DateTimeFormat('en-CA', {timeZone:TZ, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23'})
+      .formatToParts(new Date()).reduce((a, x) => (a[x.type] = x.value, a), {});
+    return new Date(Date.UTC(+p.year, p.month-1, +p.day, +p.hour, +p.minute)); }
+  catch { return new Date(); }
+}
+const hoursLate = c => { const d = wall(c.scheduled); return d ? (nowWall() - d) / 36e5 : 0; };
+const PLATS = {instagram:'Instagram', facebook:'Facebook', youtube:'YouTube', tiktok:'TikTok'};
+// What one platform's status line means. Anything not known here is a failure, on purpose.
+function kind(v) {
+  v = String(v || ''); if (!v) return null;
+  if (/^posted|published|already on/i.test(v)) return ['good', 'live'];
+  if (/inbox|draft/i.test(v)) return ['warn', 'in your inbox'];
+  if (/still processing/i.test(v)) return ['warn', 'processing'];
+  if (/not configured/i.test(v)) return ['', 'not connected'];
+  if (/off for this account/i.test(v)) return ['', 'off'];
+  if (/skipped/i.test(v)) return ['', 'skipped'];
+  return ['bad', 'failed'];
+}
+const badOn = c => Object.keys(PLATS).filter(p => (kind((c.status || {})[p]) || [])[0] === 'bad');
+const overdue = c => !c.posted && !c.retired && c.scheduled && hoursLate(c) > 2 && !badOn(c).length;
 const toast = msg => { const t = document.getElementById('toast'); t.textContent = msg; t.hidden = false; clearTimeout(t._h); t._h = setTimeout(() => t.hidden = true, 1800); };
 async function copy(text, label) {
-  try { await navigator.clipboard.writeText(text); toast(label || 'Copied'); }
-  catch { const a = document.createElement('textarea'); a.value = text; document.body.append(a); a.select(); try { document.execCommand('copy'); toast(label || 'Copied'); } catch {} a.remove(); }
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; }
+  catch { const a = document.createElement('textarea'); a.value = text; document.body.append(a); a.select(); try { ok = document.execCommand('copy'); } catch {} a.remove(); }
+  if (label !== null) toast(ok ? (label || 'Copied') : 'Could not copy. Press and hold the text to copy it');
+  return ok;
 }
-const say = (text, label = 'Tell Claude') => `<button data-copy="${esc(text)}" data-label="Copied. Paste it to your Claude" title="Copies: ${esc(text)}">${esc(label)}</button>`;
+// "TELL CLAUDE" STAYS ON SCREEN (9 Nov 2026). It used to flash "Copied" for 1.8 seconds and vanish:
+// a beginner who blinked had no idea what was copied, where to paste it, or that the copy had failed.
+async function tell(text) {
+  const ok = await copy(text, null);
+  document.getElementById('sh_t').textContent = ok ? 'Copied. Now paste it to your Claude' : 'Copy this text, then paste it to your Claude';
+  document.getElementById('sh_add').textContent = /:\s*$/.test(text) ? ', add your own words after it,' : '';
+  document.getElementById('sh_x').textContent = text;
+  document.getElementById('sheet').hidden = false;
+}
+const say = (text, label = 'Tell Claude') => `<button data-say="1" data-copy="${esc(text)}" title="Copies: ${esc(text)}">${esc(label)}</button>`;
 
 function statusChips(c) {
-  const order = ['instagram', 'facebook', 'youtube', 'tiktok'];
   const s = c.status || {}, out = [];
-  for (const p of order) {
-    const v = String(s[p] || ''); if (!v) continue;
-    let k = 'bad', t = 'failed';
-    if (v === 'posted') { k = 'good'; t = 'live'; }
-    else if (/inbox|draft/i.test(v)) { k = 'warn'; t = 'in drafts'; }
-    else if (/not configured/i.test(v)) { k = ''; t = 'not connected'; }
-    else if (/skipped/i.test(v)) { k = ''; t = 'skipped'; }
-    out.push(`<span class="chip ${k}" title="${esc(v)}">${({instagram:'IG',facebook:'FB',youtube:'YT',tiktok:'TT'})[p]} · ${t}</span>`);
+  for (const p of Object.keys(PLATS)) {
+    const k = kind(s[p]); if (!k) continue;
+    out.push(`<span class="chip ${k[0]}" title="${esc(s[p])}">${({instagram:'IG',facebook:'FB',youtube:'YT',tiktok:'TT'})[p]} · ${k[1]}</span>`);
   }
-  if (!c.posted && !c.retired) out.unshift(`<span class="chip warn">${c.scheduled ? 'scheduled ' + when(c.scheduled) : 'waiting for a slot'}</span>`);
   if (c.retired) out.unshift('<span class="chip">retired</span>');
+  else if (overdue(c)) out.unshift(`<span class="chip bad">did not post · was due ${when(c.scheduled)}</span>`);
+  else if (!c.posted) out.unshift(`<span class="chip warn">${c.scheduled ? 'scheduled ' + when(c.scheduled) : 'waiting for a slot'}</span>`);
   return out.join('');
+}
+
+// WHAT NEEDS THE MEMBER, FIRST (9 Nov 2026). The test factory showed three clips "scheduled" for a day
+// five weeks in the past, under "Up next", with nothing wrong anywhere on the page: no account was
+// connected. Everything that needs a human is now said at the top of Home, each with the one thing to do.
+function needs() {
+  const out = [], C = D.clips, hrs = (Date.now() - builtAt) / 36e5;
+  if (hrs > 3) out.push({bad:1, t:`This page last updated ${Math.round(hrs)} hours ago`,
+    p:'It should refresh every 20 minutes. Your factory may have stopped.', say:'My factory page stopped updating. Check that my factory is running and start it again.', b:'Ask Claude to check'});
+  const late = C.filter(overdue);
+  if (D.autopost != null && D.autopost !== 'on') out.push({bad:1, t:'Posting is switched off',
+    p:'Your clips are being made, but nothing is posted until your accounts are connected and posting is switched on.', say:'post: connect my accounts and switch posting on.', b:'Switch posting on'});
+  else if (late.length) out.push({bad:1, t:`${late.length} clip${late.length > 1 ? 's' : ''} should have posted and did not`,
+    p:`The oldest was due ${when(late.map(c => c.scheduled).sort()[0])}. Usually an account is not connected, or posting is switched off.`,
+    say:'My clips are not posting. Find out why, fix it, and tell me what happened.', b:'Ask Claude to fix it'});
+  const recent = C.filter(c => { const d = wall(c.scheduled || (c.posted !== 'yes' && c.posted)); return !d || (nowWall() - d) / 864e5 < 14; });
+  for (const p of Object.keys(PLATS)) {
+    const bad = recent.filter(c => badOn(c).includes(p)); if (!bad.length) continue;
+    const err = String(bad[0].status[p]).slice(0, 160);
+    const key = /token|access|permission|expired|session|oauth|unauthor|log ?in|checkpoint|password/i.test(err);
+    out.push({bad:1, t: key ? `Your ${PLATS[p]} connection stopped working` : `${bad.length} clip${bad.length > 1 ? 's' : ''} failed on ${PLATS[p]}`,
+      p:`${PLATS[p]} said: ${err}`,
+      say: key ? `Reconnect my ${PLATS[p]}. The factory said: ${err}` : `My clip "${bad[0].hook}" failed on ${PLATS[p]}: ${err}. Fix it and post it again.`,
+      b: key ? `Reconnect ${PLATS[p]}` : 'Ask Claude to fix it'});
+  }
+  const inbox = C.filter(c => /inbox|draft/i.test(String((c.status || {}).tiktok || '')) && c.views.tiktok == null && hoursLate(c) < 24 * 7);
+  if (inbox.length) out.push({t:`${inbox.length} clip${inbox.length > 1 ? 's are' : ' is'} waiting in your TikTok inbox`,
+    p:'On your phone: open TikTok, tap Inbox, open the clip, paste its caption from your Captions page, tap Post.', link:['captions.html', 'Open my captions']});
+  const left = C.filter(c => !c.posted && !c.retired && !overdue(c) && !badOn(c).length).length;
+  if (C.length && left < 3 && !out.some(x => /posted and did not|switched off/.test(x.t))) out.push({t: left ? `Only ${left} clip${left > 1 ? 's' : ''} left to post` : 'No clips left to post',
+    p:'Your Claude chooses new clips every Monday. You can also ask for more now.', say:'plan', b:'Plan more clips'});
+  return out;
+}
+function needsBlock() {
+  const n = needs();
+  return `<section class="needs"><h2>Needs <span class="gold">you</span></h2>${n.length ? n.map(x => `<div class="need ${x.bad ? 'bad' : ''}"><h3>${esc(x.t)}</h3><p class="small">${esc(x.p)}</p>
+    <div class="row">${x.say ? say(x.say, x.b) : ''}${x.link ? `<a class="btn" href="${x.link[0]}">${esc(x.link[1])}</a>` : ''}</div></div>`).join('')
+    : '<div class="need ok"><h3>Nothing needs you right now</h3><p class="small">Your factory is running by itself.</p></div>'}
+    <p class="label">Times on this page are ${esc(TZ.split('/').pop().replace(/_/g, ' '))} time</p></section>`;
 }
 
 function clipCard(c) {
@@ -134,7 +225,7 @@ function clipCard(c) {
       <div class="chips">${statusChips(c)}</div>
       <div class="nums">${total ? `${fmt(total)} views` : ''}${c.skip != null ? ` · skip ${c.skip}%` : ''}${c.watch ? ` · ${c.watch}s watched` : ''}${c.saves != null ? ` · ${fmt(c.saves)} saves` : ''}</div>
       <div class="small">From <a href="${esc(src.url || '#')}" target="_blank" rel="noopener">${esc(src.title || 'source')}</a>${range}</div>
-      <div class="row small"><a href="${esc(c.media)}" target="_blank" rel="noopener">Watch</a>${links ? ' · ' + links : ''}</div>
+      <div class="row small"><a href="${esc(c.media)}" target="_blank" rel="noopener">Download video</a>${links ? ' · ' + links : ''}</div>
       <div class="row"><button data-copy="${esc(c.caption)}" data-label="Caption copied">Copy caption</button>
         ${say(`Look at my clip "${c.hook}" (${c.file}) and tell me how to make the next one stronger.`, 'Improve the next one')}</div>
     </div></article>`;
@@ -145,20 +236,20 @@ const rooms = {
     const s = D.summary, next = D.clips.filter(c => !c.posted && !c.retired).sort((a,b) => (a.scheduled||'~').localeCompare(b.scheduled||'~')).slice(0, 4);
     const top = D.clips.filter(c => c.posted).map(c => [c, (c.views.instagram||0)+(c.views.youtube||0)+(c.views.tiktok||0)]).sort((a,b) => b[1]-a[1]).slice(0, 4).map(x => x[0]);
     const skipNote = s.skip == null ? 'appears once Instagram reports' : (s.skip <= 40 ? 'under the 40% target' : 'target: under 40%');
-    return `<section class="tiles">
+    return `${D.clips.length ? needsBlock() : ''}<section class="tiles">
       <div class="tile"><span class="label">Clips made</span><b>${fmt(s.made)}</b><small>${fmt(s.pending)} waiting to post</small></div>
       <div class="tile"><span class="label">Posted</span><b>${fmt(s.posted)}</b><small>across your platforms</small></div>
       <div class="tile"><span class="label">Views</span><b>${fmt(s.views)}</b><small>Instagram + YouTube + TikTok</small></div>
       <div class="tile"><span class="label">Skip rate</span><b>${s.skip == null ? '–' : s.skip + '%'}</b><small>${skipNote}</small></div>
-      <div class="tile"><span class="label">TikTok followers</span><b>${fmt(s.followers)}</b><small>updated every 6 hours</small></div>
+      <div class="tile"><span class="label">TikTok followers</span><b>${fmt(s.followers)}</b><small>${s.followers == null ? 'shows once TikTok is connected' : 'updated every 6 hours'}</small></div>
     </section>
     ${D.clips.length ? `
     <section style="display:grid;gap:14px"><h2>Up <span class="gold">next</span></h2>
       ${next.length ? `<div class="grid">${next.map(clipCard).join('')}</div>` : '<p class="small">Nothing waiting. Type <b>plan</b> in Claude to choose this week\'s clips.</p>'}</section>
     ${top.length ? `<section style="display:grid;gap:14px"><h2>Your <span class="gold">best</span></h2><div class="grid">${top.map(clipCard).join('')}</div></section>` : ''}`
     : `<section class="empty"><h3>Your first clips are on the way</h3>
-       <p>Open Claude and type <b>plan</b> once your first episodes are transcribed. That takes 1-3 hours after setup. This page fills itself in as clips are made and posted.</p>
-       <div class="row"><a class="btn primary" href="https://claude.ai/code" target="_blank" rel="noopener">Open Claude</a><a class="btn" href="${GH}/actions" target="_blank" rel="noopener">See the factory working</a></div></section>`}`;
+       <p>Your factory is downloading and transcribing your first episodes. That takes 1-3 hours after setup. Then your Claude chooses the first clips, and this page fills itself in as they are made and posted. Nothing to do until then.</p>
+       <div class="row">${say('Is my factory running? Tell me what it is doing right now and when my first clips arrive.', 'Ask Claude how it is going')}</div></section>`}`;
   },
   Clips() {
     return `<section style="display:grid;gap:14px">
@@ -182,40 +273,44 @@ const rooms = {
   },
   Messages() {
     const m = D.dms || {total:0, week:0, keywords:[], errors:[]};
+    const bot = D.dm_auto === 'on' || m.on;
     return `<section style="display:grid;gap:14px">
       <h2>Comment <span class="gold">→ DM</span></h2>
-      <p class="small">When someone comments your keyword on Instagram or Facebook, the factory sends them your link in a private message within 20 minutes, with your disclosure. Nobody is messaged twice.</p>
+      ${bot ? `<p class="small">When someone comments your keyword on Instagram or Facebook, the factory sends them your link in a private message within 20 minutes, with your disclosure. Nobody is messaged twice.</p>
       <section class="tiles">
         <div class="tile"><span class="label">Links sent</span><b>${fmt(m.total)}</b><small>all time</small></div>
         <div class="tile"><span class="label">This week</span><b>${fmt(m.week)}</b><small>last 7 days</small></div>
         <div class="tile"><span class="label">Best keyword</span><b>${esc((m.keywords[0]||{}).keyword || '–')}</b><small>${m.keywords[0] && m.keywords[0].per_1k != null ? m.keywords[0].per_1k + ' DMs per 1,000 views' : 'measured as comments arrive'}</small></div>
       </section>
       ${m.keywords.length ? `<div class="list">${m.keywords.map(k => `<div class="item"><div><b>${esc(k.keyword)}</b><div class="nums">${fmt(k.instagram)} Instagram · ${fmt(k.facebook)} Facebook${k.per_1k != null ? ` · ${k.per_1k} per 1,000 views` : ''}</div></div><span class="chip good">${fmt(k.dms)} sent</span></div>`).join('')}</div>`
-        : `<div class="empty"><h3>${m.on ? 'Listening for your keyword' : 'Switch it on in one sentence'}</h3><p>${m.on ? 'The first DMs show up here as soon as someone comments your keyword.' : 'Type <b>post</b> in Claude. It connects Instagram and Facebook and turns comment → DM on for you.'}</p></div>`}
+        : '<div class="empty"><h3>Listening for your keyword</h3><p>The first messages show up here as soon as someone comments your keyword.</p></div>'}`
+      : `<div class="empty"><h3>Your link is sent by Meta's own rule</h3>
+        <p>During setup your Claude built a "comment → message" rule inside your Meta Business inbox. When someone comments your keyword, Meta sends them your link within seconds.</p>
+        <p>Meta does not report those messages to this page, so there is no count here. That is normal. To see or test the rule, ask your Claude.</p></div>`}
       ${(m.errors||[]).length ? `<h3>Last problems</h3><div class="list">${m.errors.map(e => `<div class="item"><div class="nums">${esc(e.platform)} · ${esc(e.error)}</div></div>`).join('')}</div>` : ''}
-      <div class="row">${say('Which DM keyword is working best for me, and what should I try next?', 'Ask which keyword wins')}
+      <div class="row">${say('Check that my comment to DM rule is switched on, and test it with me.', 'Check my rule works')}
         ${say('Change my DM message to: ', 'Change my DM message')}
-        <a class="btn" href="${GH}/settings/variables/actions" target="_blank" rel="noopener">DM settings</a></div></section>`;
+        ${say('Change the word people comment to get my link to: ', 'Change my keyword')}</div></section>`;
   },
   Sources() {
     const s = D.sources;
     return `<section style="display:grid;gap:14px">
       <h2>Where your clips <span class="gold">come from</span></h2>
-      <p class="small">These are this month's episodes. The factory downloads them in HD, transcribes them, and your Claude picks the moments. You can add, remove or reorder any of them.</p>
-      <div class="row"><a class="btn primary" href="${edit('factory/source_plan.json')}" target="_blank" rel="noopener">Edit my sources</a>
-        ${say('Add this episode to my sources and plan clips from it: ', 'Add an episode')}
+      <p class="small">These are this month's episodes. The factory downloads them in HD, transcribes them, and your Claude picks the moments. To add or remove one, use the buttons: your Claude changes the list for you.</p>
+      <div class="row">${say('Add this episode to my sources and plan clips from it: ', 'Add an episode')}
+        ${say('Remove this episode from my sources: ', 'Remove an episode')}
         ${say('Find me the 5 best new Kevin Trudeau episodes for my lane and add them to my sources.', 'Find me 5 episodes')}</div>
       ${s.length ? `<div class="list">${s.map(e => `<div class="item"><div><a href="${esc(e.url || '#')}" target="_blank" rel="noopener">${esc(e.title)}</a><div class="nums">${esc(e.id)}</div></div>
         <span class="chip ${e.planned ? 'good' : 'warn'}">${e.planned ? 'clipped' : 'waiting'}</span></div>`).join('')}</div>`
       : '<div class="empty"><h3>No sources chosen yet</h3><p>Type <b>plan</b> in Claude and it picks the best episodes for your lane, or add your own with the buttons above.</p></div>'}
-      <p class="small muted">Use only footage the affiliate program authorises. See <a href="${GH}/blob/main/playbook/COMPLIANCE.md" target="_blank" rel="noopener">Compliance</a>.</p></section>`;
+      <p class="small muted">Use only footage the affiliate program authorises.</p></section>`;
   },
   Style() {
     const st = Object.assign({accent_color:'#FFE500', text_color:'white', shadow:'heavy', uppercase:true, hook_seconds:4.5, caption_size:72, hook_size:92}, D.style);
     return `<section class="two">
       <div style="display:grid;gap:14px">
         <h2>Your <span class="gold">look</span></h2>
-        <p class="small">Change any of these to see your clip update here. When you like it, copy the style and paste it into your style file. Every clip from then on renders this way.</p>
+        <p class="small">Change any of these to see your clip update here. When you like it, press <b>Use this look</b> and paste it to your Claude. Every clip from then on is made this way.</p>
         <div class="form">
           <label><span class="label">Accent colour (payoff line, numbers)</span><input type="color" id="s_accent" value="${/^#/.test(st.accent_color) ? st.accent_color : '#FFE500'}"></label>
           <label><span class="label">Text colour</span><input type="color" id="s_text" value="${/^#/.test(st.text_color) ? st.text_color : '#FFFFFF'}"></label>
@@ -223,8 +318,7 @@ const rooms = {
           <label><span class="label">Capitals</span><select id="s_upper"><option value="true" ${st.uppercase?'selected':''}>ALL CAPS</option><option value="false" ${!st.uppercase?'selected':''}>Normal case</option></select></label>
           <label><span class="label">Hook stays on screen (seconds)</span><input type="text" id="s_secs" inputmode="decimal" value="${st.hook_seconds}"></label>
         </div>
-        <div class="row"><button class="btn primary" id="s_copy">Copy my style</button>
-          <a class="btn" href="${edit('my_brand/style.json')}" target="_blank" rel="noopener">Open style file</a>
+        <div class="row"><button class="btn primary" id="s_copy">Use this look</button>
           ${say('style: ', 'Describe a look to Claude')}</div>
         <p class="small">You can also ask for anything not listed: your own font, a new motion, a sound under the hook, a different layout. Type <b>style</b> in Claude and describe it.</p>
       </div>
@@ -234,25 +328,24 @@ const rooms = {
   Brand() {
     return `<section style="display:grid;gap:14px">
       <h2>Your <span class="gold">voice</span></h2>
-      <p class="small">Your Claude reads this before every clip it chooses. Change it here and the next <b>plan</b> follows it.</p>
-      <div class="row"><a class="btn primary" href="${edit('my_brand/BRAND.md')}" target="_blank" rel="noopener">Edit my brand</a>
-        <a class="btn" href="${edit('my_brand/EXAMPLES.md')}" target="_blank" rel="noopener">Add examples I love</a>
+      <p class="small">Your Claude reads this before every clip it chooses. To change anything, tell your Claude in your own words and the next <b>plan</b> follows it.</p>
+      <div class="row">${say('Change my brand: ', 'Change my brand')}
         ${say('Here is a reel I love. Learn from it for my next plan: ', 'Teach it a reel')}</div>
-      <pre>${esc(D.brand || 'Not written yet. Type start in Claude.')}</pre>
+      <pre>${esc(D.brand || 'Not written yet. Your Claude writes it with you during setup.')}</pre>
       ${D.report ? `<h3>Latest factory report</h3><pre>${esc(D.report)}</pre>` : ''}</section>`;
   },
   Updates() {
     const k = D.kit || {};
     return `<section style="display:grid;gap:14px">
       <h2>Updates &amp; <span class="gold">help</span></h2>
+      <p class="small">Your factory updates itself. When a new version comes out it is installed within a few hours, or at your next weekly plan. Your brand, style, clips and keys are never touched.</p>
       <div class="list">
-        <div class="item"><div><b>Your kit</b><div class="nums">version ${esc(k.version || '1.0.0')}</div></div><span class="chip" id="up">checking…</span></div>
-        <div class="item"><div><b>Problems the factory reported</b><div class="nums" id="iss">checking…</div></div><a class="btn" href="${GH}/issues" target="_blank" rel="noopener">Open</a></div>
-        <div class="item"><div><b>The factory running right now</b><div class="nums">stocking, transcribing, building, posting</div></div><a class="btn" href="${GH}/actions" target="_blank" rel="noopener">Watch</a></div>
+        <div class="item"><div><b>Your version</b><div class="nums">${esc(k.version || '1.0.0')}</div></div><span class="chip" id="up">checking…</span></div>
+        <div class="item"><div><b>Problems the factory reported</b><div class="nums" id="iss">checking…</div></div>${say('Read the problems my factory reported and fix them.', 'Ask Claude to fix')}</div>
       </div>
       <div id="changes"></div>
-      <div class="row"><a class="btn" href="${GH}/issues/new" target="_blank" rel="noopener">Report a problem</a>
-        ${say('update: bring my factory up to the newest kit version, keep my brand, style and clips.', 'Update my factory')}
+      <div class="row">${say('Something is not working: ', 'Report a problem')}
+        ${say('Is my factory running? Tell me what it is doing right now.', 'Is it running?')}
         ${say('What new things can my factory do that I am not using yet?', 'What am I not using?')}</div></section>`;
   },
 };
@@ -275,7 +368,7 @@ function clipsWire() {
   const draw = () => {
     const q = (document.getElementById('q').value || '').toLowerCase();
     const list = D.clips.filter(c => {
-      const bad = Object.values(c.status||{}).some(v => v && !/posted|inbox|draft|not configured|skipped/i.test(String(v)));
+      const bad = badOn(c).length || overdue(c);
       if (f === 'Waiting' && (c.posted || c.retired)) return false;
       if (f === 'Live' && !c.posted) return false;
       if (f === 'Needs attention' && !bad) return false;
@@ -296,7 +389,7 @@ function styleWire() {
     [h, c].forEach(el => { el.style.color = s.text_color; el.style.textShadow = shadows[s.shadow]; el.style.textTransform = s.uppercase ? 'uppercase' : 'none'; });
     h.querySelector('span').style.color = s.accent_color; c.style.color = s.accent_color; };
   ['s_accent','s_text','s_shadow','s_upper','s_secs'].forEach(id => g(id).addEventListener('input', paint));
-  g('s_copy').addEventListener('click', () => copy(JSON.stringify(Object.assign({}, D.style, cur()), null, 1), 'Style copied. Paste it into your style file'));
+  g('s_copy').addEventListener('click', () => tell('style: change my look to exactly this: ' + JSON.stringify(cur())));
   paint();
 }
 async function openMoney(pass) {
@@ -323,10 +416,10 @@ function moneyWire() {
         <div class="tile"><span class="label">Links by DM</span><b>${fmt(dm.total)}</b><small>comment → DM</small></div>
         <div class="tile"><span class="label">Clicks</span><b>${fmt(sum('clicks'))}</b><small>from your portal</small></div>
         <div class="tile"><span class="label">Sales</span><b>${fmt(sum('sales'))}</b><small>${sum('clicks') ? (100*sum('sales')/sum('clicks')).toFixed(1) + '% of clicks' : ''}</small></div>
-        <div class="tile"><span class="label">Commission</span><b>$${sum('commission').toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})}</b><small>30% of every sale</small></div></section>
+        <div class="tile"><span class="label">Commission</span><b>$${sum('commission').toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})}</b><small>from your portal</small></div></section>
         <div class="list">${Object.entries(brands).sort((a,b) => b[1].commission - a[1].commission).map(([b, x]) => `<div class="item"><div><b>${esc(b)}</b><div class="nums">${fmt(x.clicks)} clicks · ${fmt(x.sales)} sales</div></div><span class="chip good">$${x.commission.toFixed(2)}</span></div>`).join('')}</div>
         <p class="nums">Last recorded ${esc((rows[rows.length-1]||{}).date || '')}</p>`;
-    } catch { out.innerHTML = '<p class="small" style="color:var(--bad)">That passphrase did not open it. Try again.</p>'; }
+    } catch { out.innerHTML = '<p class="small" style="color:var(--bad)">That passphrase did not open it. Check capital letters and try again. Forgot it? Nobody can recover it, but your Claude can start a new record: tell it "I forgot my money passphrase, start my money record again".</p>'; }
   });
 }
 async function updatesWire() {
@@ -335,29 +428,35 @@ async function updatesWire() {
     if (!k.upstream) throw 0;
     const r = await fetch(`https://raw.githubusercontent.com/${k.upstream}/main/KIT.json`, {cache:'no-store'});
     const u = await r.json();
-    const newer = (u.version || '') > (k.version || '');
-    up.textContent = newer ? `update ${u.version} ready` : 'up to date';
-    up.className = 'chip ' + (newer ? 'warn' : 'good');
-    if (newer && u.changes) document.getElementById('changes').innerHTML = `<h3>What's new in ${esc(u.version)}</h3><ul>${u.changes.map(x => `<li>${esc(x)}</li>`).join('')}</ul><p class="small">Type <b>update</b> in Claude to get it. Your brand, style and clips stay as they are.</p>`;
-  } catch { up.textContent = 'could not check'; up.className = 'chip'; }
+    const num = v => String(v || '0').split('.').map(Number);
+    const a = num(u.version), b = num(k.version);
+    const newer = a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+    up.textContent = newer > 0 ? `${u.version} is installing by itself` : 'newest version';
+    const newerOut = newer > 0;
+    up.className = 'chip ' + (newerOut ? 'warn' : 'good');
+    if (newerOut && u.changes) document.getElementById('changes').innerHTML = `<h3>What's new in ${esc(u.version)}</h3><ul>${u.changes.slice(0, 4).map(x => `<li>${esc(x)}</li>`).join('')}</ul><p class="small">Nothing to do. Want it this minute? Type <b>update</b> in your Claude.</p>`;
+  } catch { up.textContent = 'could not check right now'; up.className = 'chip'; }
   try {
     const r = await fetch(`https://api.github.com/repos/${R}/issues?state=open&per_page=20`);
     const a = (await r.json()).filter(i => !i.pull_request);
-    document.getElementById('iss').textContent = a.length ? `${a.length} open: ${a.slice(0,2).map(i => i.title).join(' · ')}` : 'none open';
-  } catch { document.getElementById('iss').textContent = 'could not check'; }
+    const issEl = document.getElementById('iss'); if (issEl) issEl.textContent = a.length ? `${a.length} open: ${a.slice(0,2).map(i => i.title).join(' · ')}` : 'none open';
+  } catch { const e = document.getElementById('iss'); if (e) e.textContent = 'could not check right now'; }
 }
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-room]'); if (t) { show(t.dataset.room); return; }
-  const c = e.target.closest('[data-copy]'); if (c) copy(c.dataset.copy, c.dataset.label);
+  const c = e.target.closest('[data-copy]'); if (c) { c.dataset.say ? tell(c.dataset.copy) : copy(c.dataset.copy, c.dataset.label); return; }
+  if (e.target.id === 'sh_close') document.getElementById('sheet').hidden = true;
+  if (e.target.id === 'sh_again') copy(document.getElementById('sh_x').textContent, 'Copied');
+  if (e.target.id === 'newer') location.reload();
 });
-// LIVE: the factory rewrites this page on every run. When a newer one is published, reload into it.
-const builtAt = new Date(D.built.replace('Z', ':00Z'));
+// LIVE: the factory rewrites this page on every run. A newer one is OFFERED, never forced: the old
+// automatic reload wiped a half-typed passphrase or a look being tried in the Style room.
 function fresh() { const m = Math.max(0, Math.round((Date.now() - builtAt) / 60000));
-  document.getElementById('fresh').textContent = m < 60 ? `updated ${m} min ago` : `updated ${when(D.built)}`;
-  document.getElementById('dot').style.background = m < 90 ? 'var(--good)' : 'var(--warn)'; }
+  document.getElementById('fresh').textContent = m < 60 ? `updated ${m} min ago` : `updated ${builtAt.toLocaleString([], {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'})}`;
+  document.getElementById('dot').style.background = m < 90 ? 'var(--good)' : (m < 180 ? 'var(--warn)' : 'var(--bad)'); }
 async function poll() {
   try { const r = await fetch(location.pathname + '?t=' + Date.now(), {cache:'no-store'}); const t = await r.text();
-    const m = t.match(/"built": "([^"]+)"/); if (m && m[1] !== D.built) location.reload(); } catch {}
+    const m = t.match(/"built": "([^"]+)"/); if (m && m[1] !== D.built) document.getElementById('newer').hidden = false; } catch {}
 }
 fresh(); setInterval(fresh, 60000); setInterval(poll, 300000);
 show(current);

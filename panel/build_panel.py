@@ -191,6 +191,11 @@ def build():
         "repo": REPO,
         "built": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%MZ"),
         "kit": load("KIT.json", {}),
+        # The factory's clock and switches, so the page can say "posting is off" instead of
+        # showing a clip as "scheduled" for a day long gone. None = this run was not told.
+        "tz": os.environ.get("KT_TZ") or "America/New_York",
+        "autopost": os.environ.get("PANEL_AUTOPOST"),
+        "dm_auto": os.environ.get("PANEL_DM_AUTO"),
         "summary": summary(rows),
         "dms": dm_stats(rows),
         # Earnings stay encrypted here; the Money room decrypts them in the

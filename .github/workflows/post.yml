@@ -157,6 +157,8 @@ jobs:
         if: ${{ !inputs.dry_run && inputs.trial == '' }}
         env:
           KT_TZ: ${{ vars.KT_TZ || 'America/New_York' }}
+          PANEL_AUTOPOST: ${{ vars.AUTOPOST || 'off' }}
+          PANEL_DM_AUTO: ${{ vars.DM_AUTO || 'off' }}
         run: python build_pages.py && python panel/build_panel.py
 
       - name: Queue alarm
