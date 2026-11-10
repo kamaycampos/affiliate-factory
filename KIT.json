@@ -1,5 +1,5 @@
 {
- "version": "1.5.1",
+ "version": "1.5.2",
  "upstream": "kamaycampos/affiliate-factory",
  "changes": [
   "1.5.1: your control panel tells you first what needs you (posting off, a clip that did not post, a connection that stopped, clips waiting in TikTok), each with one button; every change goes through your Claude; all rooms fit a phone",
@@ -17,6 +17,5 @@
   "Saves cannot be lost: a factory run that fails to push its clips now fails out loud instead of showing success",
   "Faster, safer builds: trial hooks render on their own servers; the board's 'copied' ticks survive rebuilds",
   "Newest caption engine and edge checks (shared with the live accounts, 2 Nov)"
- ],
- "old_workflows_ok": "1.5.1"
+ ]
 }
