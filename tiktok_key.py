@@ -5,21 +5,26 @@ Proven on WB Organics, 15 Oct 2026. TikTok does not approve personal posting app
 member's own TikTok developer app stays in SANDBOX, with their own TikTok account added
 as a sandbox "target user". Sandbox + "Upload to TikTok" (video.upload) = inbox drafts.
 
-    python3 tiktok_key.py
+    python3 tiktok_key.py <SANDBOX_CLIENT_KEY>
 
-1. Asks for the SANDBOX client key and secret (TikTok for Developers -> app -> Sandbox ->
-   Credentials). The secret is hidden while pasted.
+1. Asks for the SANDBOX client secret (TikTok for Developers -> app -> Sandbox ->
+   Credentials) in a paste box in the browser (key_box.py) - never the Terminal.
 2. Writes the consent link to .tt_auth_url (their Claude opens it in their Chrome).
-3. They tap Authorize, land on their control panel, copy the address bar and paste it here.
+3. They tap Authorize and land on their control panel. Their Claude reads that tab's address
+   and writes it to .tt_landed (a one-time code, useless without the secret); if it cannot,
+   a second paste box asks the member for that address.
 4. Stores TT_CLIENT_KEY, TT_CLIENT_SECRET, TT_REFRESH_TOKEN in their repository's secrets
    and prints the TikTok account it reached. Nothing secret is ever printed.
 
 The redirect is their control panel (https://OWNER.github.io/REPO/). It must be listed
 under Sandbox -> Login Kit -> Redirect URI before running this.
 """
-import getpass, hashlib, json, os, re, secrets, subprocess, sys, urllib.parse, urllib.request
+import hashlib, json, os, re, secrets, subprocess, sys, urllib.parse, urllib.request
+
+import key_box
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+LANDED = os.path.join(HERE, ".tt_landed")
 URLFILE = os.path.join(HERE, ".tt_auth_url")
 SCOPES = "user.info.basic,user.info.profile,user.info.stats,video.list,video.upload"
 
@@ -33,10 +38,15 @@ REPO = f"{OWNER}/{NAME}"
 REDIRECT = f"https://{OWNER.lower()}.github.io/{NAME}/"
 
 print(f"\n  TikTok inbox for {REPO}. Redirect URI to register in the Sandbox: {REDIRECT}")
-CK = sys.argv[1] if len(sys.argv) > 1 else input("  PASTE THE SANDBOX CLIENT KEY, then Enter: ").strip()
-CS = getpass.getpass("  PASTE THE SANDBOX CLIENT SECRET (nothing shows), then Enter: ").strip()
-if len(CK) < 8 or len(CS) < 8:
-    sys.exit("  One of them was empty. Run this again.")
+_args = [a for a in sys.argv[1:] if not a.startswith("--")]
+_fields = [{"name": "cs", "label": "Client secret", "min": 8,
+            "help": "TikTok for Developers: your app, Sandbox, Credentials. Click the small arrow or copy icon next to Client secret."}]
+if not _args:
+    _fields.insert(0, {"name": "ck", "label": "Client key", "min": 8, "secret": False,
+                       "help": "Same place, the line above: Client key. It starts with sb."})
+_got = key_box.ask("Paste your TikTok key", _fields)
+CK, CS = (_args[0] if _args else _got["ck"]), _got["cs"]
+os.path.exists(LANDED) and os.remove(LANDED)
 
 ver = secrets.token_urlsafe(48)
 state = "tt" + secrets.token_hex(5)
@@ -44,11 +54,23 @@ open(URLFILE, "w").write("https://www.tiktok.com/v2/auth/authorize/?" + urllib.p
     "client_key": CK, "response_type": "code", "scope": SCOPES, "redirect_uri": REDIRECT,
     "state": state, "code_challenge": hashlib.sha256(ver.encode()).hexdigest(),
     "code_challenge_method": "S256"}))
-print("\n  1. In Chrome, tap Authorize on TikTok (Claude opens the page).")
-print("  2. You land on your control panel. Click its address bar, Cmd+A (Ctrl+A), copy.")
-print("  3. Click back here, paste, Enter.\n")
-landed = input("  > ").strip()
+print("\n  The secret is in. The TikTok page to open is in .tt_auth_url.", flush=True)
+print("  After Authorize they land on their control panel: write that tab's full address to .tt_landed", flush=True)
+
+
+def _landed():
+    if os.path.exists(LANDED):
+        t = open(LANDED).read().strip()
+        return {"landed": t} if "code=" in t else None
+
+
+landed = key_box.ask("One last step for TikTok", [
+    {"name": "landed", "label": "The address of the page you landed on", "min": 20, "secret": False,
+     "help": "After you tap Authorize on TikTok you land on your control panel. Click its address bar at the top, "
+             "select all (Cmd+A, Windows Ctrl+A), copy, and paste it here."}],
+    watch=_landed, open_now=False)["landed"]   # opened only if Claude could not read the address itself
 os.path.exists(URLFILE) and os.remove(URLFILE)
+os.path.exists(LANDED) and os.remove(LANDED)
 q = urllib.parse.parse_qs(urllib.parse.urlparse(landed).query)
 if q.get("state", [""])[0] != state or "code" not in q:
     sys.exit("  That address has no fresh TikTok code. Run this again.")

@@ -17,7 +17,7 @@ In the Instagram app: **Settings and activity** → **Messages and story replies
 ## 4. Create your free Meta app (4 min). You:
 1. Go to **developers.facebook.com** and log in with the Facebook account that runs your Page. Click **Get started** if asked, and accept.
 2. **My Apps** → **Create app** → choose **Other** → **Business** → name it, e.g. `My Factory` → **Create app**.
-3. In the app: **App settings → Basic**. Copy the **App ID** and **App secret** (click Show), and paste both to Claude.
+3. In the app: **App settings → Basic**. Tell Claude the **App ID** (a number, not a secret). Leave the **App secret** on the page: you paste it in step 5, into a box, never into the chat.
 
 Your app stays in development mode, which is enough to post and send DMs on accounts you own. Meta's App Review is not needed.
 
@@ -27,7 +27,7 @@ Your app stays in development mode, which is enough to post and send DMs on acco
 3. Tick these permissions:
    `pages_show_list`, `pages_read_engagement`, `pages_read_user_content`, `pages_manage_posts`, `pages_manage_engagement`, `pages_messaging`, `publish_video`, `business_management`, `instagram_basic`, `instagram_content_publish`, `instagram_manage_comments`, `instagram_manage_insights`, `instagram_manage_messages`
 4. **Generate Access Token** → continue as yourself → select your Page and your Instagram → **Save**
-5. Copy the token at the top and paste it to Claude.
+5. Claude opens a page with two boxes in your Chrome (`python3 meta_key.py <APP_ID>`). Paste the **App secret** in box 1 and the token from the top of the Explorer in box 2, and click **Save**. Never paste a key into the chat.
 
 **Claude** then:
 - turns it into a long-lived token (`oauth/access_token?grant_type=fb_exchange_token`)
@@ -35,7 +35,9 @@ Your app stays in development mode, which is enough to post and send DMs on acco
 - finds your Page ID and Instagram account ID (`/{page}?fields=instagram_business_account`)
 - checks all of it with one test call
 
-## 6. Paste five secrets and two variables (3 min). You:
+## 6. The secrets and two variables (Claude stores them; nothing for you to paste)
+**`meta_key.py` has already stored the four Meta secrets below for you in step 5.** The list is here only so you know what exists. Claude sets the variables with `gh variable set`.
+
 Go to your repository → **Settings** → **Secrets and variables** → **Actions**.
 
 **Secrets** tab → **New repository secret**, one at a time. Claude gives you each value:

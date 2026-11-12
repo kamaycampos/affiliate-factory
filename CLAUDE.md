@@ -15,7 +15,7 @@ You are running a member's copy of **The Affiliate Factory**. It is a clip machi
 0. **Can you drive their browser?** If this session has Claude in Chrome connected (a local session started with `claude --chrome`), do every web step yourself in their Chrome: GitHub "Use this template", repo secrets and variables, Pages, the Meta app and Graph Explorer, Google Cloud OAuth, the TikTok developer app. Stop only for log-ins, 2-factor codes, "Allow / Continue as" approvals, and their six answers. Before your first click, ask once: "May I use your Chrome to set everything up? You'll approve each log-in." Never type a password yourself; let them type it.
    - If you are running in the cloud (claude.ai/code) without browser access, offer once: "I can do all the clicking for you if you connect your computer. It takes about 3 minutes, following SETUP_COMPUTER.md." If they decline, guide each click yourself, one step at a time.
 1. Run `python3 personalize.py`. It writes their repo name into the machine, saves FACTORY_KEY and TRANSCRIPT_KEY in a private file (`~/.REPO-NAME.keys`) and stores both in GitHub with `gh`. Never print or paste them.
-2. Store `OFFER_URL` (their affiliate link): `gh secret set OFFER_URL`.
+2. Store `OFFER_URL`: their affiliate link to the FREE Your Wish Is Your Command audios (the portal's "Free Your Wish" link): `gh secret set OFFER_URL`. A page showing all of Kevin's products with their links is a later option, only if they ask.
 3. Turn on **GitHub Pages** (Settings → Pages → Deploy from a branch → `main` / `/docs`), yourself when you can drive the browser.
 4. Interview them, **at most 6 questions, asked one at a time**:
    1. What name should your audience know you by? What is your handle on each platform?

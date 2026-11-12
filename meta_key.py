@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
-"""Instagram + Facebook key, pasted by the member into THIS prompt - never into a chat.
+"""Instagram + Facebook key, pasted by the member into a box in their browser - never a chat,
+never the Terminal (key_box.py; `--terminal` asks here as before).
 
     python3 meta_key.py <APP_ID>
 
-Asks (hidden) for the App secret (Meta app -> App settings -> Basic) and the token from
+Asks for the App secret (Meta app -> App settings -> Basic) and the token from
 Graph API Explorer (Generate Access Token, with their Page and Instagram ticked). Swaps it
 for a long-lived user token, then for their Page token, which does not expire, and stores
 FB_PAGE_ID, FB_ACCESS_TOKEN, IG_USER_ID, IG_ACCESS_TOKEN in their repository's secrets.
 Prints only the Page and Instagram names it reached. Proven pattern: WB Organics, 15 Oct 2026.
 """
-import getpass, json, os, re, subprocess, sys, urllib.parse, urllib.request
+import json, os, re, subprocess, sys, urllib.parse, urllib.request
+
+import key_box
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 u = subprocess.run(["git", "-C", HERE, "remote", "get-url", "origin"], capture_output=True, text=True).stdout.strip()
@@ -25,12 +28,12 @@ def get(path, **q):
         sys.exit("  Meta refused: " + json.load(e).get("error", {}).get("message", str(e)))
 
 
-print("\n  PASTE THE APP SECRET (Meta app -> App settings -> Basic -> Show), then Enter.")
-SECRET = getpass.getpass("  (nothing shows) > ").strip()
-print("\n  PASTE THE TOKEN from Graph API Explorer (the long key at the top), then Enter.")
-USER = getpass.getpass("  (nothing shows) > ").strip()
-if len(SECRET) < 10 or len(USER) < 50:
-    sys.exit("  One of them was empty. Run this again.")
+_got = key_box.ask("Paste your two Meta keys", [
+    {"name": "secret", "label": "1. App secret", "min": 10,
+     "help": "On your Meta app page: App settings, then Basic. Click Show next to App secret and copy it."},
+    {"name": "token", "label": "2. Access token", "min": 50,
+     "help": "In Graph API Explorer: the long key in the Access Token box at the top. Copy all of it."}])
+SECRET, USER = _got["secret"], _got["token"]
 
 long_user = get("oauth/access_token", grant_type="fb_exchange_token", client_id=APP,
                 client_secret=SECRET, fb_exchange_token=USER)["access_token"]
@@ -50,9 +53,8 @@ pages = [p for p in pages if p.get("instagram_business_account")] or pages
 if not pages:
     sys.exit("  No Facebook Page came with this token. Generate it again and tick your Page.")
 if len(pages) > 1:
-    for i, p in enumerate(pages, 1):
-        print(f"  {i}. {p['name']}  (@{(p.get('instagram_business_account') or {}).get('username', '-')})")
-    pages = [pages[int(input("  Which number is yours? ").strip()) - 1]]
+    pages = [pages[key_box.choose("Which Page is yours?", [
+        f"{p['name']}  (Instagram: @{(p.get('instagram_business_account') or {}).get('username', 'none linked')})" for p in pages])]]
 p = pages[0]
 ig = p.get("instagram_business_account") or {}
 if not ig:

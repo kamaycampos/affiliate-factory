@@ -7,3 +7,11 @@ __pycache__/
 work/
 kit/dustin/
 my_brand/LOOK_PREVIEW.jpg
+
+# set-up scratch files: addresses and logs, never a key
+.key_box_url
+.tt_landed
+.tt_auth_url
+.yt_auth_url
+.gh_login.txt
+.*_key.log

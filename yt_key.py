@@ -3,11 +3,10 @@
 
     python3 yt_key.py <CLIENT_ID>        (proven on WB Organics, 15 Oct 2026)
 
-Asks for the OAuth client SECRET (hidden), waits for the Google "Allow" click at
+Asks for the OAuth client SECRET in a paste box in the browser (key_box.py), waits for the Google "Allow" click at
 http://127.0.0.1:8765, then stores YT_CLIENT_ID, YT_CLIENT_SECRET, YT_REFRESH_TOKEN in
 the repo's GitHub secrets and prints the channel name it can upload to.
 """
-import getpass
 import http.server
 import json
 import os
@@ -17,6 +16,7 @@ import urllib.parse
 import urllib.request
 
 import re
+import key_box
 HERE = os.path.dirname(os.path.abspath(__file__))
 _u = subprocess.run(["git", "-C", HERE, "remote", "get-url", "origin"], capture_output=True, text=True).stdout.strip()
 _m = re.search(r"github\.com[:/]+([^/]+/[^/.]+?)(?:\.git)?/?$", _u) or re.search(r"/([^/]+/[^/.]+?)(?:\.git)?/?$", _u)
@@ -30,16 +30,15 @@ SCOPES = " ".join([
     "https://www.googleapis.com/auth/yt-analytics.readonly",
 ])
 
-print("\n  PASTE THE CLIENT SECRET HERE (Cmd+V), then press Enter.")
-print("  (Nothing shows while you paste - that is on purpose.)")
-SECRET = getpass.getpass("  > ").strip()
-if len(SECRET) < 10:
-    sys.exit("  That was not the client secret. Copy it again and re-run.")
+SECRET = key_box.ask("Paste your YouTube key", [
+    {"name": "secret", "label": "Client secret", "min": 10,
+     "help": "On the Google Cloud page: click the copy icon next to Client secret."}])["secret"]
 
 url = "https://accounts.google.com/o/oauth2/v2/auth?" + urllib.parse.urlencode({
     "client_id": CID, "redirect_uri": REDIRECT, "response_type": "code",
     "scope": SCOPES, "access_type": "offline", "prompt": "consent"})
 open(os.path.join(HERE, ".yt_auth_url"), "w").write(url)
+print("\n  The secret is in. The Google page to open is in .yt_auth_url.", flush=True)
 print("\n  Now click Allow in Chrome (Claude opens the page). If Google says it hasn't verified the app: Advanced -> Go to (your app). Waiting...")
 
 code = {}

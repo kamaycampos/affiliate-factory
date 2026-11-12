@@ -1,7 +1,7 @@
 WELCOME TO THE AFFILIATE FACTORY
 
-Follow steps A1 to A7 yourself. They take about 15 minutes, once.
-In step A8 you hand this file to Claude, and Claude takes over from there.
+Follow steps A1 to A8 yourself. They take about 20 minutes, once.
+In step A9 you hand this file to Claude, and Claude takes over from there.
 
 
 BEFORE WE START: 3 QUESTIONS
@@ -21,10 +21,10 @@ BEFORE WE START: 3 QUESTIONS
 
 WHAT YOU NEED BEFORE YOU START
 
-1. Your Kevin Trudeau affiliate link (from the affiliate portal).
+1. Your Kevin Trudeau affiliate link to the FREE Your Wish Is Your Command audios (in the affiliate portal: the "Free Your Wish" link).
 2. The email and password for your Instagram, Facebook, YouTube (your Google account) and TikTok.
 3. Your phone, close by. Some sites text you a code.
-4. About 45 minutes in total (15 minutes for steps A1 to A8, then about 30 minutes with Claude), at a time when nobody needs your computer.
+4. About 50 minutes in total (20 minutes for steps A1 to A9, then about 30 minutes with Claude), at a time when nobody needs your computer.
 
 
 A1. GET CLAUDE PRO (3 minutes)
@@ -102,12 +102,26 @@ See a picture of where these are:
    https://kamaycampos.github.io/affiliate-factory/start/#a6
 
 
-A7. KEEP YOUR COMPUTER AWAKE (10 seconds)
+A7. MAKE YOUR FREE GITHUB ACCOUNT, BY HAND (3 minutes)
+
+GitHub is the free website where your factory lives. You make this account yourself: GitHub does not allow accounts made by a robot, so Claude must not do this for you.
+
+Do you already have a GitHub account?
+- Yes: open github.com in Chrome, sign in, and go to A8. Use that account. One person may have only one free GitHub account.
+- No: do steps 1 to 4 below.
+
+1. In Chrome, open github.com and click the button that says Sign up.
+2. Type your email, a password you choose, and a username (your name or brand, small letters, no spaces).
+3. GitHub emails you a code. Type it in.
+4. Stay signed in to GitHub in Chrome.
+
+
+A8. KEEP YOUR COMPUTER AWAKE (10 seconds)
 
 Plug the computer in, and don't close the lid during setup. Some steps run for a few minutes.
 
 
-A8. START (10 seconds)
+A9. START (10 seconds)
 
 Drag this file into the chat box, type: Set me up.
 Then press Enter.
@@ -116,7 +130,7 @@ From here on, Claude leads. For about 30 minutes you only do four kinds of thing
 1. Log in where Claude asks. You type your own passwords; Claude never sees them.
 2. Click Allow, Continue or Agree when Claude tells you to.
 3. Choose how your clips look and sound, and what they are about.
-4. Paste a key when Claude asks: copy it from the web page, click inside the Terminal tab Claude opened (above the chat), press Cmd+V (Windows: Ctrl+V), then Enter. Nothing shows while you paste. That is normal.
+4. Paste a key when Claude asks: a page with a box opens in Chrome. Copy the key from the web page, click in the box, press Cmd+V (Windows: Ctrl+V), then click Save. Dots show instead of the key. That is normal.
 
 
 IF SOMETHING GETS IN THE WAY
@@ -131,13 +145,13 @@ IF SOMETHING GETS IN THE WAY
 
 ==================================================================
 THIS IS THE END OF YOUR PART. YOU CAN STOP READING HERE.
-Everything below is written for Claude, not for you. Claude reads it when you drag this file in at step A8.
+Everything below is written for Claude, not for you. Claude reads it when you drag this file in at step A9.
 ==================================================================
 
 ## FOR CLAUDE: read all of this before your first message to the member
 (Part A above is written as plain text on purpose: members open this file in plain-text viewers and it may be machine-translated. Keep it free of markdown marks.)
 
-**Setup file version: 1.5.1.** The member may hold an old copy of this file. Before your first message, read the newest one: `curl -fsSL https://raw.githubusercontent.com/kamaycampos/affiliate-factory/main/THE_AFFILIATE_FACTORY.md`. If its version is higher than this one, follow that copy's FOR CLAUDE part instead of this one. If it cannot be read, carry on with this copy.
+**Setup file version: 1.6.0.** The member may hold an old copy of this file. Before your first message, read the newest one: `curl -fsSL https://raw.githubusercontent.com/kamaycampos/affiliate-factory/main/THE_AFFILIATE_FACTORY.md`. If its version is higher than this one, follow that copy's FOR CLAUDE part instead of this one. If it cannot be read, carry on with this copy.
 
 You are setting up **The Affiliate Factory** for a Kevin Trudeau affiliate. Assume they are **not technical, possibly older, and easily overwhelmed**. They will judge the whole product by how these 30 minutes *feel*. If they feel lost even once, the product failed. Your tone: warm, calm and brief, one thing at a time.
 
@@ -185,10 +199,10 @@ Check each one yourself before you say "done". Don't take a tool's word for it: 
 1. **Show, don't tell.** Before every step, open the visual guide card for that step: https://kamaycampos.github.io/affiliate-factory/start/cards.html . Or take a screenshot of the exact screen and say where to click. Never send them to read a document.
    **Name a button by the words written on it. Give its colour or its place on the page only when you are looking at it right now** in a screenshot or page read taken in this step. Websites redesign: on 7 Nov 2026 the first member was told "the black button at the top right" for GitHub's Sign up, and what she saw was a big green button in the middle. From memory, say only "the button that says Sign up".
 2. **One step per message.** Say what's about to happen in one sentence, do it, and confirm it worked in one sentence. Show a progress bar like `Step 3 of 7 ▓▓▓░░░░`.
-3. **They only do four kinds of things:** log in (they type their own passwords; **you never type a password, code or card number**), click **Allow / Continue / Agree**, choose, and paste a key into a Terminal tab you opened. Everything else is yours. Every time they act, say **which window, which tab, which button, where on the screen** ("Chrome, the tab called *TikTok for Developers*, the small ⌄ arrow to the right of *Client secret*"). Never say "paste the script" or "run the box": say "click inside the Terminal tab called *X*, press Cmd+V, then Enter", and say where that tab is from what you see on their screen now (the Terminal panel can sit above the chat or on the right).
-   **If they say nothing happens in the Terminal tab** (7 Nov 2026: the first member pressed Enter there and nothing happened): ask them once to click in the middle of the tab's black area, not on its name, and press the key again. If it still does nothing, do not make them try a third time: do that step another way yourself, or close that tab and open a fresh one. Never ask for a key press in the Terminal that you can avoid; the three key pastes are the only ones this setup needs.
+3. **They only do four kinds of things:** log in (they type their own passwords; **you never type a password, code or card number**), click **Allow / Continue / Agree**, choose, and paste a key into a paste-box page you opened in their Chrome. Everything else is yours. Every time they act, say **which window, which tab, which button, where on the screen** ("Chrome, the tab called *TikTok for Developers*, the small ⌄ arrow to the right of *Client secret*").
+   **The member never types or pastes anything in the Terminal** (10 Nov 2026: for the first member, pasting and Enter did not work in the Terminal tab at all, three times). You run every command yourself, in the background. If you ever catch yourself about to ask them for a key press in the Terminal, find another way.
 4. **You drive their Chrome** with Claude in Chrome (never the app's built-in Browser pane: it has none of their logins). Ask once at the start: *"May I use your Chrome to set everything up? You'll approve each log-in."* It's the difference between 30 minutes and 3 hours. If they have two Chrome windows or profiles, pick the one logged in to the account each step needs, and tell them which one you are in.
-5. **No key, token or password ever passes through the chat, and you never type one.** Every key goes in through a **paste prompt in their Terminal panel** that you open for them (`meta_key.py`, `yt_key.py`, `tiktok_key.py` in their repo): they copy the key from the website, click into the Terminal tab, paste, press Enter. The script stores it in GitHub and prints only the account name it reached. Tell them exactly: *"Click the ⌄ / copy icon next to X, then click inside the Terminal tab called Y, Cmd+V, Enter. Nothing shows while you paste."*
+5. **No key, token or password ever passes through the chat, and you never type one or read one.** Every key goes in through a **paste box**: a small page on their own computer that the key scripts open (`meta_key.py`, `yt_key.py`, `tiktok_key.py`, through `key_box.py`). You start the script in the background with its output in a log file, for example `python3 -u meta_key.py <APP_ID> > .meta_key.log 2>&1 &`. Within a second the page's address is in `.key_box_url` (and in the log): open that address in the Chrome window they are looking at. They copy the key from the website, click in the box, paste, click **Save**; the page says "Saved". Then read the log: it prints only the account name it reached, or what the platform refused. Do not take a screenshot of the paste-box page while a key is in it. If the script failed, run it again: a fresh box opens.
 6. **Keep the Chrome window you are driving in front.** A Chrome window hidden behind others stops responding to clicks (Google Cloud forms freeze). If a page stops reacting, ask them to bring that window to the front and leave it there.
 7. **Watch the clock.** Each step below has a time budget. If a step runs over by 5 minutes, stop, say plainly what's blocking, offer the simplest way around it, and keep going.
 8. **Never leave them on a dead end.** If something can't be done today (an app approval, a waiting period), say exactly what happens instead and when. Then move on.
@@ -208,7 +222,7 @@ Greet them in two lines, show the progress bar, then check each item yourself an
    - **Mac:** if a popup appears saying the command needs developer tools, `[Them]` click **Install** and **Agree** (5-10 minutes; keep going with Step 3's questions while it installs).
    - **Windows:** `winget install --silent Git.Git Python.Python.3.12`, then reopen the Terminal tab.
 4. **GitHub's tool `gh`.** Run `gh --version`. Missing? **Mac:** download the newest `gh_*_macOS_universal.zip` from github.com/cli/cli/releases (newest release, *Assets*), unzip into `~/bin`, add `~/bin` to PATH in `~/.zshrc`. **Windows:** `winget install --silent GitHub.cli`.
-5. **GitHub account.** Open github.com in their Chrome. No account? `[Them]` click the button that says **Sign up** (do not describe its colour or place unless you are looking at it), with their email and a password they choose; they type the emailed code. You fill in everything else (username = their name or brand, lowercase, no spaces).
+5. **GitHub account: made by the member, by hand** (Part A, step A7). Open github.com in their Chrome and check they are signed in. If they are not, or have no account, `[Them]` sign in or sign up themself: every field, the button that says **Sign up**, and the emailed code. **Never fill in or submit any part of GitHub's sign-up form yourself, and never create a second account for someone who has one.** GitHub's terms: accounts registered by automated methods are not permitted, and one person keeps one free account. The first member's account, which Claude helped fill in, was suspended on 10 Nov 2026.
 6. **Log `gh` in, with nothing for them to do in the Terminal.** Run it yourself in the background with the keyboard closed, so it asks no question and waits for no Enter: `gh auth login --web --git-protocol https --hostname github.com --scopes workflow < /dev/null > .gh_login.txt 2>&1 &`. Read `.gh_login.txt`: it holds a one-time code like `ABCD-1234`. Open **https://github.com/login/device** in their Chrome yourself. Tell them the code in the chat (this one-time code is the only code that ever appears in the chat). `[Them]` type the code on that page, then click the buttons that say **Continue** and **Authorize github**. Then run `gh auth status` (it must show their GitHub name) and `gh auth setup-git`, and delete `.gh_login.txt`. Never open a Terminal tab for this step. The `workflow` scope is asked for here so that no later push stops for a second approval.
 
 ### Step 1: Their own factory (2 min) · *Card 1*
@@ -217,7 +231,8 @@ Greet them in two lines, show the progress bar, then check each item yourself an
 - `[You]` Read the new `my-factory/CLAUDE.md`. From now on, follow its `start` section **in the order and style of this document**. Work inside `my-factory` for every command below.
 
 ### Step 2: The keys and the control panel (3 min) · *Card 2*
-- `[You]` Run `python3 personalize.py`. It saves `FACTORY_KEY` and `TRANSCRIPT_KEY` in a private file on their computer (`~/.my-factory.keys`; `plan` reads transcripts with it) and stores both in GitHub. Never print them. Then `gh secret set OFFER_URL` with their affiliate link.
+- `[You]` Run `python3 personalize.py`. It saves `FACTORY_KEY` and `TRANSCRIPT_KEY` in a private file on their computer (`~/.my-factory.keys`; `plan` reads transcripts with it) and stores both in GitHub. Never print them.
+- **Which link.** Ask for **their affiliate link to the FREE Your Wish Is Your Command audios** (in the affiliate portal, affiliate.kevintrudeau.com, it is the "Free Your Wish" link; the page is freeyourwish.kevintrudeau.com with their own code on it). It is free for the viewer, so it is the easiest yes, and whoever takes it is tied to them. If they ask about their other links (the book and the rest): *"We start with the free audios. Later, if you want, I can send people to one page that shows all of Kevin's products with your links. Just tell me."* Do not set that page up now. Store the link: `gh secret set OFFER_URL`.
 - `[You]` Build their control panel now, so its address works from the first minute (Google and TikTok are given this address in Step 4): `GITHUB_REPOSITORY=OWNER/my-factory python3 panel/build_panel.py`, then commit and push `docs/`.
 - `[You]` Turn on Pages: `gh api -X POST repos/OWNER/my-factory/pages -f "source[branch]=main" -f "source[path]=/docs"`. Open `https://OWNER.github.io/my-factory/` a minute later and see the page yourself.
 - `[You]` Set their clock: ask *"Which city do you live in or near?"*, then `gh variable set KT_TZ --body "<their time zone, like America/Chicago>"`. Posting times and every time on their control panel follow it.
@@ -242,15 +257,15 @@ Ask **one question at a time**, with examples they can see or hear:
   4. `[Them]` **developers.facebook.com → Get started** (they accept Meta's terms and verify their phone). If Meta says the phone number is already used, it belongs to another developer account of theirs: use that account's app instead.
   5. `[You]` **My Apps → Create app → Other → Business**, name it `My Factory`. Open **Graph API Explorer**, pick their app, tick: `pages_show_list, pages_read_engagement, pages_manage_posts, business_management, instagram_basic, instagram_content_publish, instagram_manage_comments, instagram_manage_insights, instagram_manage_messages`.
   6. `[Them]` **Generate Access Token → Continue as… → tick THEIR Page and THEIR Instagram** (check the ID numbers if two pages look alike) **→ Save**. If their Page or Instagram is missing from that list, close it, reload, and generate again.
-  7. `[You]` Open a Terminal tab running `python3 meta_key.py <APP_ID>`. `[Them]` paste the **App secret** (App settings → Basic → Show), then the **token** from the Explorer. It prints their Page and @Instagram name.
+  7. `[You]` Start `python3 -u meta_key.py <APP_ID> > .meta_key.log 2>&1 &` and open the address in `.key_box_url` in their Chrome. `[Them]` paste the **App secret** (App settings → Basic → Show) in box 1 and the **token** from the Explorer in box 2, click **Save**. If they hold more than one Page, a second page asks which one: they click theirs. The log prints their Page and @Instagram name.
 - **YouTube (~8 min), in the Chrome that is logged in to their YouTube:**
   1. `[You]` console.cloud.google.com → new project `my-factory` (`[Them]` accept Google Cloud's terms if asked). Enable **YouTube Data API v3** AND **YouTube Analytics API**, and re-open each to confirm it says **Enabled**.
   2. `[You]` Google Auth Platform → Get started: app name `My Factory`, their email, **External**, their email again; `[Them]` tick the User Data Policy → **Create**. **Branding:** home page = their panel `https://OWNER.github.io/my-factory/`, privacy = `…/legal/privacy.html`, terms = `…/legal/terms.html`, authorized domain = `OWNER.github.io` → Save. **Audience → Publish app → Confirm** (in Testing, the key dies after 7 days).
-  3. `[You]` **Clients → Create client → Desktop app → Create.** Read the Client ID off the dialog. Open a Terminal tab running `python3 yt_key.py <CLIENT_ID>`. `[Them]` click the copy icon next to **Client secret**, paste it in the Terminal tab, Enter. `[You]` open the link in `.yt_auth_url` in their Chrome. `[Them]` pick their account (and channel), **Advanced → Go to My Factory** if Google warns, tick all → **Continue**. It prints their channel name.
+  3. `[You]` **Clients → Create client → Desktop app → Create.** Read the Client ID off the dialog. Start `python3 -u yt_key.py <CLIENT_ID> > .yt_key.log 2>&1 &` and open the address in `.key_box_url`. `[Them]` click the copy icon next to **Client secret**, paste it in the box, click **Save**. `[You]` open the link in `.yt_auth_url` in their Chrome. `[Them]` pick their account (and channel), **Advanced → Go to My Factory** if Google warns, tick all → **Continue**. The log prints their channel name.
 - **TikTok (~6 min): clips land in their TikTok app INBOX; they open it, paste the caption from their panel's Captions board, tap Post.** TikTok does not approve personal posting apps, so their own app stays in **Sandbox**, which is enough for inbox drafts:
   1. `[Them]` log in at **developers.tiktok.com** (their TikTok account) and accept the terms. `[You]` **Manage apps → Connect an app**, name it `My Factory`, switch to **Sandbox** (create one). Add products **Login Kit** (Web redirect URI = their panel `https://OWNER.github.io/my-factory/`) and **Content Posting API** (Upload to TikTok); scopes `user.info.basic, user.info.profile, user.info.stats, video.list, video.upload`. **Apply changes.**
   2. **Sandbox settings → Target users → Add account → Continue.** `[Them]` log in as **their** TikTok account in the window that opens. Their @name must appear in the list.
-  3. `[You]` open a Terminal tab running `python3 tiktok_key.py <SANDBOX_CLIENT_KEY>` (the key is under Sandbox → Credentials; it starts with `sb`). `[Them]` copy the **Client secret** (⌄ next to it), paste in the Terminal tab, Enter. `[You]` open the link in `.tt_auth_url`. `[Them]` **Authorize**, then copy the address bar of the page they land on and paste it in the Terminal tab, Enter. It prints their @TikTok name.
+  3. `[You]` Start `python3 -u tiktok_key.py <SANDBOX_CLIENT_KEY> > .tiktok_key.log 2>&1 &` (the key is under Sandbox → Credentials; it starts with `sb`) and open the address in `.key_box_url`. `[Them]` copy the **Client secret** (⌄ next to it), paste it in the box, click **Save**. `[You]` open the link in `.tt_auth_url`. `[Them]` **Authorize**; they land on their control panel. `[You]` read that tab's full address (it holds a one-time code, not a key) and write it to `.tt_landed`. If you cannot read it, open the new address in `.key_box_url`: `[Them]` copy the address bar and paste it there. The log prints their @TikTok name.
 - **Prove all four at once:** `gh workflow run check_keys.yml`, then read its log. It must print their Instagram, Facebook Page, YouTube channel and TikTok name. Anything that prints FAILED is not done.
 
 Then `[You]` set the repository **variable** `AUTOPOST` = `on`, and the secret `KT_PLATFORMS` = the platforms you connected (e.g. `instagram,facebook,youtube,tiktok`).

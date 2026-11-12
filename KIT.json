@@ -1,7 +1,8 @@
 {
- "version": "1.5.2",
+ "version": "1.6.0",
  "upstream": "kamaycampos/affiliate-factory",
  "changes": [
+  "1.6.0: keys are pasted into a box on a page in your browser, never the Terminal; your link is the FREE Your Wish Is Your Command audios; you make your GitHub account yourself, by hand",
   "1.5.1: your control panel tells you first what needs you (posting off, a clip that did not post, a connection that stopped, clips waiting in TikTok), each with one button; every change goes through your Claude; all rooms fit a phone",
   "1.5.0: your factory updates itself - GitHub checks the original every few hours and every weekly plan checks again; nothing of yours is replaced",
   "1.5.0: setup one step at a time on a simple page (tick, Next, skips what you already have); GitHub login with nothing to type in the Terminal",

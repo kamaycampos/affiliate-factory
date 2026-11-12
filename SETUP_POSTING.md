@@ -17,7 +17,7 @@ You need:
 
 It never needs Meta's App Review, because it only posts to your own accounts.
 
-Your Claude gets your Page token with you in the Graph API Explorer and turns it into a **permanent** one. You then paste four secrets:
+Your Claude gets your Page token with you in the Graph API Explorer and turns it into a **permanent** one. You paste the two keys into a box on a page Claude opens in your Chrome (`meta_key.py`), never into the chat, and it stores four secrets for you:
 - `IG_USER_ID`
 - `IG_ACCESS_TOKEN`
 - `FB_PAGE_ID`
@@ -35,7 +35,7 @@ Every click is in **[SETUP_META.md](SETUP_META.md)**, written for someone who ha
 **If you already use Meta's built-in auto-replies or ManyChat**, keep one system only, or people get two DMs. ManyChat (paid) adds follow-up sequences and lead capture. It is never needed.
 
 ## YouTube
-You need a free Google Cloud project with **YouTube Data API v3** turned on, and an OAuth client. Your Claude gets the refresh token with you in Google's OAuth Playground. You then paste three secrets:
+You need a free Google Cloud project with **YouTube Data API v3** turned on, and an OAuth client. Your Claude starts `yt_key.py`: you paste the client secret into a box on a page in your Chrome and click Allow on Google's page. It stores three secrets for you:
 - `YT_CLIENT_ID`
 - `YT_CLIENT_SECRET`
 - `YT_REFRESH_TOKEN`
@@ -45,7 +45,7 @@ You need a free Google Cloud project with **YouTube Data API v3** turned on, and
 **One-time review:** Google keeps uploads from a brand-new API project private until the project passes the free YouTube API audit (a form, usually days to a few weeks). Your Claude fills it in with you. Until it passes, your clips still reach YouTube from the board in two taps.
 
 ## TikTok
-You need a free TikTok developer app with **Content Posting API** and **Login Kit**. Your Claude runs the `tiktok_token` workflow with you. You then paste three secrets:
+You need a free TikTok developer app with **Content Posting API** and **Login Kit**. Your Claude starts `tiktok_key.py`: you paste the client secret into a box on a page in your Chrome and tap Authorize on TikTok. It stores three secrets for you:
 - `TT_CLIENT_KEY`
 - `TT_CLIENT_SECRET`
 - `TT_REFRESH_TOKEN`
